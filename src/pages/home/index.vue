@@ -5,7 +5,7 @@
   * @version 0.8.0
 -->
 <template>
-  <t-navbar :fixed="true" style="z-index: 2000">
+  <t-navbar style="z-index: 2000">
     <template #left>
       <t-search placeholder="搜索商品"/>
     </template>
@@ -26,32 +26,55 @@
       @scrolltolower="handleScrolltolower"
   >
     <div class="home-container">
-      <div class="goodsList">
-        <GoodsCard
-            v-for="item in 10"
-            :key="item"
-            goodsName="商品名称"
-            deadline="2021-08-08 20:00:00"
-            remainingAmount="1000"
-            type="1"
-        />
+      <div class="goodsList" v-for="item in goodsList">
+        <GoodsCard :key="item.index" :goodsInfo="item"/>
       </div>
       <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
     </div>
   </t-pull-down-refresh>
+  <t-tab-bar v-model="value" :split="false">
+    <t-tab-bar-item v-for="item in list" :key="item.value" :value="item.value" @click="switchTab(item)">
+      {{ item.label }}
+      <template #icon>
+        <t-icon :name="item.icon"/>
+      </template>
+    </t-tab-bar-item>
+  </t-tab-bar>
 </template>
 
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
 import GoodsCard from "@/pages/home/GoodsCard.vue";
+import router from "@/router";
 
 /**
  * data
  */
+const value = ref('home');
+const list = ref([
+  {value: 'home', label: '首页', icon: 'home'},
+  {value: 'user', label: '我的', icon: 'user'},
+]);
+
 // 下拉刷新状态
 const refreshing = ref(false);
 // 搜索框的值
 const searchValue = ref('');
+
+const goodsList = ref([
+  {
+    index: 1,
+    goodsName: '商品名称1',
+    deadline: '2021-08-08 20:00:00',
+    remainingAmount: '1000',
+  },
+  {
+    index: 2,
+    goodsName: '商品名称2',
+    deadline: '2023-08-23 21:00:00',
+    remainingAmount: '3242',
+  }
+]);
 
 /**
  * methods区
@@ -65,6 +88,12 @@ onMounted(() => {
 /**
  * 操作钩子
  */
+// 切换tab
+const switchTab = (item: any) => {
+  router.push({
+    path: `/${item.value}`
+  })
+};
 // 下拉刷新
 const handleRefresh = (value: any) => {
   refreshing.value = true;
@@ -86,12 +115,21 @@ const searchGoods = () => {
   console.log(searchValue.value);
 }
 
+// 获取商品详情
+// const getDetail = (item: any) => {
+//   console.log(item);
+//   router.push({
+//     path: '/declaration',
+//     query: item
+//   })
+// }
 </script>
 
 <style lang="less" scoped>
 .home-container {
   width: 100vw;
-  background: #eee;
+  min-height: 100vh;
+  background: #f3f3f3;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

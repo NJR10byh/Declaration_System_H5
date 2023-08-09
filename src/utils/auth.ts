@@ -86,21 +86,14 @@ export const userInfoToCache = async (info: {
         userInfo.userIdCard = res.userIdCard;
         userStore.getUserInfo(userInfo);
     }).catch(err => {
-        Toast({
-            theme: 'error',
-            direction: 'column',
-            message: err.message,
-        });
+        Toast.error(err.message)
     }).finally(() => {
     });
     /* 处理主题 */
     formData.value.mode = chargeTheme(); // 根据当前系统时间切换主题模式（light、dark）
 
-    await Toast({
-        theme: 'success',
-        direction: 'column',
-        message: "欢迎您，" + info.userName,
-    });
+    Toast.success("欢迎您，" + info.userName)
+
 
     /* 分权限处理 默认跳转页 */
     switch (userInfo.role) {

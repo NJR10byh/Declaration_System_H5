@@ -74,11 +74,7 @@ const onSubmit = async ({validateResult}) => {
       }).then(async res => {
         await userInfoToCache(res);
       }).catch(err => {
-        Toast({
-          theme: 'error',
-          direction: 'column',
-          message: err.message,
-        });
+        Toast.error(err.message)
       }).finally(() => {
         loginBtnLoading.value = false;
       });
