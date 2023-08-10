@@ -22,5 +22,11 @@ export default [
         name: "declaration",
         component: () => import("@/pages/declaration/index.vue"),
         meta: {title: "报单", rolePermission: ["superadmin"]}
+    },
+    {
+        path: "/business",
+        name: "business",
+        component: () => import("@/pages/business/index.vue"),
+        meta: {title: "概览", rolePermission: ["superadmin"]}
     }
 ];

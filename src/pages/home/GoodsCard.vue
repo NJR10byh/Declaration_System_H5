@@ -14,7 +14,7 @@
     <div class="options">
       <div class="left">剩余额度：{{ goodsInfo.remainingAmount }}</div>
       <div class="btns">
-        <t-button theme="primary" variant="outline" size="small" style="margin-right: 5px;">复制</t-button>
+        <t-button theme="primary" variant="outline" size="small" style="margin-right: 5px;">复制商品链接</t-button>
         <t-button theme="primary" size="small" @click="getDetail(goodsInfo)">去报单</t-button>
       </div>
     </div>

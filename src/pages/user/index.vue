@@ -5,6 +5,61 @@
   * @version 0.8.0
 -->
 <template>
+  <div class="user-container">
+    <t-avatar image="https://tdesign.gtimg.com/mobile/demos/avatar_1.png" size="large"
+              style="margin-top: 60px"></t-avatar>
+    <div style="margin-top: 10px;font-size: 15px;color: #888;">测试用户</div>
+    <t-grid :column="4" theme="card" class="grid-demo" border>
+      <t-grid-item text="已报单" @click="to_business('已报单')">
+        <template #image>
+          <t-icon name="file" size="2em"/>
+        </template>
+      </t-grid-item>
+      <t-grid-item text="审核中">
+        <template #image>
+          <t-icon name="info-circle" size="2em"/>
+        </template>
+      </t-grid-item>
+      <t-grid-item text="待返款">
+        <template #image>
+          <t-icon name="money-circle" size="2em"/>
+        </template>
+      </t-grid-item>
+      <t-grid-item text="已返款">
+        <template #image>
+          <t-icon name="check-circle" size="2em"/>
+        </template>
+      </t-grid-item>
+    </t-grid>
+
+    <t-cell-group theme="card" class="cellGroup">
+      <t-cell title="我的报单" arrow>
+        <template #leftIcon>
+          <t-icon name="view-module"/>
+        </template>
+      </t-cell>
+      <t-cell title="我的账单" arrow>
+        <template #leftIcon>
+          <t-icon name="root-list"/>
+        </template>
+      </t-cell>
+      <t-cell title="个人信息" arrow>
+        <template #leftIcon>
+          <t-icon name="user"/>
+        </template>
+      </t-cell>
+      <t-cell title="修改密码" arrow>
+        <template #leftIcon>
+          <t-icon name="tools"/>
+        </template>
+      </t-cell>
+      <t-cell title="退出登录" arrow>
+        <template #leftIcon>
+          <t-icon name="logout"/>
+        </template>
+      </t-cell>
+    </t-cell-group>
+  </div>
   <t-tab-bar v-model="value" :split="false">
     <t-tab-bar-item v-for="item in list" :key="item.value" :value="item.value" @click="switchTab(item)">
       {{ item.label }}
@@ -50,8 +105,39 @@ const switchTab = (item: any) => {
 /**
  * 业务相关
  */
+const to_business = (page: any) => {
+  switch (page) {
+    
+  }
+}
 </script>
 
 <style lang="less" scoped>
+.user-container {
+  width: 100vw;
+  min-height: 100vh;
+  background: #f3f3f3;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 
+  .grid-demo {
+    width: 90%;
+    margin-top: 70px;
+
+    .t-grid-item /deep/ .t-grid-item__image {
+      background: #fff;
+    }
+  }
+
+  .cellGroup {
+    width: 90%;
+    margin-top: 10px;
+
+    .t-icon {
+      color: #000;
+    }
+  }
+}
 </style>
