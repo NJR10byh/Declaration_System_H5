@@ -15,17 +15,17 @@
           <t-icon name="file" size="2em"/>
         </template>
       </t-grid-item>
-      <t-grid-item text="审核中">
+      <t-grid-item text="待审核" @click="to_business('待审核')">
         <template #image>
           <t-icon name="info-circle" size="2em"/>
         </template>
       </t-grid-item>
-      <t-grid-item text="待返款">
+      <t-grid-item text="待返款" @click="to_business('待返款')">
         <template #image>
           <t-icon name="money-circle" size="2em"/>
         </template>
       </t-grid-item>
-      <t-grid-item text="已返款">
+      <t-grid-item text="已返款" @click="to_business('已返款')">
         <template #image>
           <t-icon name="check-circle" size="2em"/>
         </template>
@@ -106,9 +106,12 @@ const switchTab = (item: any) => {
  * 业务相关
  */
 const to_business = (page: any) => {
-  switch (page) {
-    
-  }
+  router.push({
+    path: '/business',
+    query: {
+      page: page
+    }
+  });
 }
 </script>
 
