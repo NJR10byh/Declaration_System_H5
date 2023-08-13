@@ -9,7 +9,6 @@ import {request} from "@/utils/request";
 import {Toast} from "tdesign-mobile-vue";
 import {reactive, ref} from "vue";
 import STYLE_CONFIG from "@/config/style";
-import {chargeTheme} from "@/utils/date";
 import {isNotEmpty} from "@/utils/validate";
 import router from "@/router";
 
@@ -90,7 +89,7 @@ export const userInfoToCache = async (info: {
     }).finally(() => {
     });
     /* 处理主题 */
-    formData.value.mode = chargeTheme(); // 根据当前系统时间切换主题模式（light、dark）
+    // formData.value.mode = chargeTheme(); // 根据当前系统时间切换主题模式（light、dark）
 
     Toast.success("欢迎您，" + info.userName)
 
