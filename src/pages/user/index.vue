@@ -53,7 +53,7 @@
           <t-icon name="tools"/>
         </template>
       </t-cell>
-      <t-cell title="退出登录" arrow>
+      <t-cell title="退出登录" arrow @click="handleLogout">
         <template #leftIcon>
           <t-icon name="logout"/>
         </template>
@@ -124,6 +124,11 @@ const to_userInfo = () => {
 const to_changePassword = () => {
   router.push("/changePassword");
 }
+
+const handleLogout = async () => {
+  await router.push("/login");
+  window.location.reload();
+};
 </script>
 
 <style lang="less" scoped>
