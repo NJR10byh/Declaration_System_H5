@@ -33,12 +33,12 @@
     </t-grid>
 
     <t-cell-group theme="card" class="cellGroup">
-      <t-cell title="我的报单" arrow>
+      <t-cell title="我的报单" arrow @click="to_business('全部')">
         <template #leftIcon>
           <t-icon name="view-module"/>
         </template>
       </t-cell>
-      <t-cell title="我的账单" arrow>
+      <t-cell title="我的账单" arrow @click="to_myBill">
         <template #leftIcon>
           <t-icon name="root-list"/>
         </template>
@@ -60,8 +60,8 @@
       </t-cell>
     </t-cell-group>
   </div>
-  <t-tab-bar v-model="value" :split="false">
-    <t-tab-bar-item v-for="item in list" :key="item.value" :value="item.value" @click="switchTab(item)">
+  <t-tab-bar v-model="barValue" :split="false">
+    <t-tab-bar-item v-for="item in barList" :key="item.value" :value="item.value" @click="switchTab(item)">
       {{ item.label }}
       <template #icon>
         <t-icon :name="item.icon"/>
@@ -77,8 +77,8 @@ import router from "@/router";
 /**
  * data
  */
-const value = ref('user');
-const list = ref([
+const barValue = ref('user');
+const barList = ref([
   {value: 'home', label: '首页', icon: 'home'},
   {value: 'user', label: '我的', icon: 'user'},
 ]);
@@ -112,6 +112,10 @@ const to_business = (page: any) => {
       page: page
     }
   });
+}
+
+const to_myBill = () => {
+  router.push("/myBill");
 }
 </script>
 

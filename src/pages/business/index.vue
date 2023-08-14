@@ -32,8 +32,9 @@
       </div>
     </div>
 
-    <div style="width: 100%;display:flex;justify-content: center;align-items:center;" v-for="item in declarationList">
-      <DeclarationCard :declarationInfo="item"/>
+    <div style="width: 100%;display:flex;justify-content: center;align-items:center;"
+         v-for="(item,index) in declarationList">
+      <DeclarationCard :key="index" :declarationInfo="item"/>
     </div>
 
 
@@ -62,8 +63,8 @@
     </t-popup>
     <t-loading theme="spinner" text="加载中..." :loading="loading"/>
   </div>
-  <t-tab-bar v-model="value" :split="false">
-    <t-tab-bar-item v-for="item in list" :key="item.value" :value="item.value" @click="switchTab(item)">
+  <t-tab-bar v-model="barValue" :split="false">
+    <t-tab-bar-item v-for="item in barList" :key="item.value" :value="item.value" @click="switchTab(item)">
       {{ item.label }}
       <template #icon>
         <t-icon :name="item.icon"/>
@@ -83,8 +84,8 @@ const route = useRoute();
 /**
  * data
  */
-const value = ref('');
-const list = ref([
+const barValue = ref('');
+const barList = ref([
   {value: 'home', label: '首页', icon: 'home'},
   {value: 'user', label: '我的', icon: 'user'},
 ]);
@@ -116,13 +117,17 @@ const declarationList = reactive([
     goodsName: "蒙牛早餐奶（社群专属）",
     goodsNum: "11",
     goodsDate: "03-30",
-    goodsStatus: "已报单"
+    goodsStatus: "已报单",
+    relMoney: "1012",
+    preBackMoney: "2000"
   },
   {
     goodsName: "蒙牛早餐奶（社群专属）",
     goodsNum: "11",
     goodsDate: "03-29",
-    goodsStatus: "未报单"
+    goodsStatus: "未报单",
+    relMoney: "1012",
+    preBackMoney: "2000"
   }
 ])
 

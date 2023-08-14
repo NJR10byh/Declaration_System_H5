@@ -28,5 +28,17 @@ export default [
         name: "business",
         component: () => import("@/pages/business/index.vue"),
         meta: {title: "概览", rolePermission: ["superadmin"]}
+    },
+    {
+        path: "/applyBackMoney",
+        name: "applyBackMoney",
+        component: () => import("@/pages/applyBackMoney/index.vue"),
+        meta: {title: "申请返款", rolePermission: ["superadmin"]}
+    },
+    {
+        path: "/myBill",
+        name: "myBill",
+        component: () => import("@/pages/myBill/index.vue"),
+        meta: {title: "我的账单", rolePermission: ["superadmin"]}
     }
 ];

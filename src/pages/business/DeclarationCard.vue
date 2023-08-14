@@ -28,11 +28,8 @@
           <div style="width: 50%;">微信名：</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 50%;">实付金额：</div>
-          <div style="width: 50%;">返款折扣：</div>
-        </div>
-        <div class="contentInfo">
-          <div style="width: 100%;">预计返款金额：</div>
+          <div style="width: 50%;">实付金额：{{ declarationInfo.relMoney }}</div>
+          <div style="width: 50%;">预计返款金额：{{ declarationInfo.preBackMoney }}</div>
         </div>
         <div class="contentInfo">
           <div style="width: 100%;">报单时间：</div>
@@ -53,8 +50,10 @@
         <div class="contentInfo">
           <div style="width: 100%;">审核备注：</div>
         </div>
-        <div></div>
-        <div></div>
+        <div class="contentBtns">
+          <t-button theme="light" size="small" style="margin-right: 5px;">修改订单</t-button>
+          <t-button theme="primary" size="small" @click="applyBackMoney(declarationInfo)">申请返款</t-button>
+        </div>
       </div>
     </t-collapse-panel>
   </t-collapse>
@@ -62,6 +61,7 @@
 
 <script setup lang="ts">
 import {onMounted, reactive} from "vue";
+import router from "@/router";
 
 const props = defineProps({
   declarationInfo: Object
@@ -87,6 +87,13 @@ onMounted(() => {
 /**
  * 业务相关
  */
+const applyBackMoney = (declarationInfo: any) => {
+  console.log(declarationInfo);
+  router.push({
+    path: '/applyBackMoney',
+    query: declarationInfo
+  })
+}
 </script>
 
 <style lang="less" scoped>
@@ -144,6 +151,13 @@ onMounted(() => {
       color: #999;
       font-size: 15px;
       font-weight: bold;
+    }
+
+    .contentBtns {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
     }
   }
 }

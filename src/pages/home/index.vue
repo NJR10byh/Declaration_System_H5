@@ -26,14 +26,14 @@
       @scrolltolower="handleScrolltolower"
   >
     <div class="home-container">
-      <div class="goodsList" v-for="item in goodsList">
-        <GoodsCard :key="item.index" :goodsInfo="item"/>
+      <div class="goodsList" v-for="(item,index) in goodsList">
+        <GoodsCard :key="index" :goodsInfo="item"/>
       </div>
       <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
     </div>
   </t-pull-down-refresh>
-  <t-tab-bar v-model="value" :split="false">
-    <t-tab-bar-item v-for="item in list" :key="item.value" :value="item.value" @click="switchTab(item)">
+  <t-tab-bar v-model="barValue" :split="false">
+    <t-tab-bar-item v-for="item in barList" :key="item.value" :value="item.value" @click="switchTab(item)">
       {{ item.label }}
       <template #icon>
         <t-icon :name="item.icon"/>
@@ -50,8 +50,8 @@ import router from "@/router";
 /**
  * data
  */
-const value = ref('home');
-const list = ref([
+const barValue = ref('home');
+const barList = ref([
   {value: 'home', label: '首页', icon: 'home'},
   {value: 'user', label: '我的', icon: 'user'},
 ]);
