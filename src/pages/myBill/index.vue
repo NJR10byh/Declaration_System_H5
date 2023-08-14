@@ -8,7 +8,8 @@
   <t-navbar title="我的账单" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
   <div class="my-bill-container">
     <t-cell-group class="cellGroup" theme="card">
-      <t-cell v-for="(item,index) in billList" :key="index" :title="item.date" :note="'¥'+item.money" arrow/>
+      <t-cell v-for="(item,index) in billList" :key="index" :title="item.date" :note="'¥'+item.money" arrow
+              @click="getDetail(item)"/>
     </t-cell-group>
     <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
   </div>
@@ -29,7 +30,6 @@ import {useRoute, useRouter} from "vue-router";
 const route = useRoute();
 const router = useRouter();
 
-const declarationInfo = route.query;
 /**
  * data
  */
@@ -56,7 +56,6 @@ const billList = reactive([
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-  console.log(declarationInfo);
 
 });
 
@@ -76,8 +75,11 @@ const switchTab = (item: any) => {
 /**
  * 业务相关
  */
-const to_home = () => {
-  router.push("/home");
+const getDetail = (item) => {
+  router.push({
+    path: `/billDetail`,
+    query: item
+  })
 }
 </script>
 

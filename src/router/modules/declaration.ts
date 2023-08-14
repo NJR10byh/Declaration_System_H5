@@ -40,5 +40,11 @@ export default [
         name: "myBill",
         component: () => import("@/pages/myBill/index.vue"),
         meta: {title: "我的账单", rolePermission: ["superadmin"]}
+    },
+    {
+        path: "/billDetail",
+        name: "billDetail",
+        component: () => import("@/pages/myBill/detail.vue"),
+        meta: {title: "账单详情", rolePermission: ["superadmin"]}
     }
 ];
