@@ -88,8 +88,6 @@ export const userInfoToCache = async (info: {
         Toast.error(err.message)
     }).finally(() => {
     });
-    /* 处理主题 */
-    // formData.value.mode = chargeTheme(); // 根据当前系统时间切换主题模式（light、dark）
 
     Toast.success("欢迎您，" + info.userName)
 

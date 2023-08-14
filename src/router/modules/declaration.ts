@@ -18,6 +18,12 @@ export default [
         meta: {title: "我的", rolePermission: ["superadmin"]}
     },
     {
+        path: "/userInfo",
+        name: "userInfo",
+        component: () => import("@/pages/user/userInfo.vue"),
+        meta: {title: "个人信息", rolePermission: ["superadmin"]}
+    },
+    {
         path: "/declaration",
         name: "declaration",
         component: () => import("@/pages/declaration/index.vue"),
@@ -46,5 +52,11 @@ export default [
         name: "billDetail",
         component: () => import("@/pages/myBill/detail.vue"),
         meta: {title: "账单详情", rolePermission: ["superadmin"]}
+    },
+    {
+        path: "/changePassword",
+        name: "changePassword",
+        component: () => import("@/pages/login/changePassword.vue"),
+        meta: {title: "修改密码", rolePermission: ["superadmin"]}
     }
 ];

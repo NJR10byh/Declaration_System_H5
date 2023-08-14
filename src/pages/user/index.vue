@@ -43,12 +43,12 @@
           <t-icon name="root-list"/>
         </template>
       </t-cell>
-      <t-cell title="个人信息" arrow>
+      <t-cell title="个人信息" arrow @click="to_userInfo">
         <template #leftIcon>
           <t-icon name="user"/>
         </template>
       </t-cell>
-      <t-cell title="修改密码" arrow>
+      <t-cell title="修改密码" arrow @click="to_changePassword">
         <template #leftIcon>
           <t-icon name="tools"/>
         </template>
@@ -116,6 +116,13 @@ const to_business = (page: any) => {
 
 const to_myBill = () => {
   router.push("/myBill");
+}
+
+const to_userInfo = () => {
+  router.push("/userInfo");
+}
+const to_changePassword = () => {
+  router.push("/changePassword");
 }
 </script>
 
