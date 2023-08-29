@@ -44,12 +44,12 @@ export default ({mode}: ConfigEnv): UserConfig => {
             port: 3006,
             host: "localhost",
             proxy: {
-                "/patent_dev": { /* 测试环境 */
-                    target: "http://cgzh.njupt.edu.cn:8080",
+                "/userReport": { /* 测试环境 */
+                    target: "http://47.113.188.245:8900",
                     // 允许跨域
                     changeOrigin: true
-                    // pathRewrite: { // 在发出请求后将 /patent 替换为''空值，这样不影响接口请求
-                    //   '^/patent': ''
+                    // pathRewrite: { // 在发出请求后将 /userReport 替换为''空值，这样不影响接口请求
+                    //   '^/userReport': ''
                     // }
                 }
             }
