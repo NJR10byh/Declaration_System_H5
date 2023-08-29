@@ -7,10 +7,10 @@
 <template>
   <t-navbar style="z-index: 2000">
     <template #left>
-      <t-search placeholder="搜索商品"/>
+      <t-search placeholder="搜索商品" v-model="searchValue"/>
     </template>
     <template #right>
-      <t-button theme="primary">
+      <t-button theme="primary" @click="searchGoods">
         <template #icon>
           <t-icon name="search"></t-icon>
         </template>
@@ -46,6 +46,9 @@
 import {onMounted, ref} from "vue";
 import GoodsCard from "@/pages/home/GoodsCard.vue";
 import router from "@/router";
+import {request} from "@/utils/request";
+import {BASE_URL} from "./constants";
+import {setObjToUrlParams} from "@/utils/request/utils";
 
 /**
  * data
@@ -61,20 +64,7 @@ const refreshing = ref(false);
 // 搜索框的值
 const searchValue = ref('');
 
-const goodsList = ref([
-  {
-    index: 1,
-    goodsName: '商品名称1',
-    deadline: '2021-08-08 20:00:00',
-    remainingAmount: '1000',
-  },
-  {
-    index: 2,
-    goodsName: '商品名称2',
-    deadline: '2023-08-23 21:00:00',
-    remainingAmount: '3242',
-  }
-]);
+const goodsList = ref([]);
 
 /**
  * methods区
@@ -82,7 +72,8 @@ const goodsList = ref([
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-
+  // 获取商品列表
+  getGoodsList();
 });
 
 /**
@@ -97,9 +88,7 @@ const switchTab = (item: any) => {
 // 下拉刷新
 const handleRefresh = (value: any) => {
   refreshing.value = true;
-  setTimeout(() => {
-    refreshing.value = false;
-  }, 1000);
+  getGoodsList();
 };
 
 // 触底
@@ -110,19 +99,23 @@ const handleScrolltolower = () => {
 /**
  * 业务相关
  */
+const getGoodsList = () => {
+  goodsList.value = [];
+  request.get({
+    url: setObjToUrlParams(BASE_URL.queryList, {keyWord: searchValue.value})
+  }).then(res => {
+    console.log(res);
+    goodsList.value = res;
+  }).catch(err => {
+    console.log(err);
+  }).finally(() => {
+    refreshing.value = false;
+  })
+}
 // 搜索商品
 const searchGoods = () => {
-  console.log(searchValue.value);
+  getGoodsList();
 }
-
-// 获取商品详情
-// const getDetail = (item: any) => {
-//   console.log(item);
-//   router.push({
-//     path: '/declaration',
-//     query: item
-//   })
-// }
 </script>
 
 <style lang="less" scoped>
@@ -147,7 +140,7 @@ const searchGoods = () => {
 
   .goodsList {
     width: 100%;
-    padding: 10px;
+    padding: 6px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

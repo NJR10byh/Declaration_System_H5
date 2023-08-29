@@ -7,15 +7,17 @@
 <template>
   <div class="goodsCard">
     <div class="goodsInfo">
-      <div class="name">{{ goodsInfo.goodsName }}</div>
-      <div class="deadline">截止日期：{{ goodsInfo.deadline }}</div>
+      <div class="name">{{ goodsInfo.commodity }}</div>
+      <div class="deadline">截止日期：{{ timestampToDateTime(goodsInfo.endTime) }}</div>
     </div>
     <t-divider/>
     <div class="options">
-      <div class="left">剩余额度：{{ goodsInfo.remainingAmount }}</div>
+      <div class="left">剩余额度：{{ goodsInfo.remainAmount }} 元</div>
       <div class="btns">
-        <t-button theme="primary" variant="outline" size="small" style="margin-right: 5px;">复制商品链接</t-button>
-        <t-button theme="primary" size="small" @click="getDetail(goodsInfo)">去报单</t-button>
+        <t-button theme="primary" variant="outline" size="small" style="margin-right: 5px;" @click="copyUrl(goodsInfo)">
+          复制商品链接
+        </t-button>
+        <t-button theme="primary" size="small" @click="toReport(goodsInfo)">去报单</t-button>
       </div>
     </div>
   </div>
@@ -24,6 +26,8 @@
 <script setup lang="ts">
 import {onMounted, reactive} from "vue";
 import router from "@/router";
+import {timestampToDateTime} from "@/utils/date";
+import {copyInfo} from "@/utils/tools";
 
 const props = defineProps({
   goodsInfo: Object
@@ -50,13 +54,18 @@ onMounted(() => {
 /**
  * 业务相关
  */
-
-const getDetail = (goodsInfo: any) => {
+// 去报单
+const toReport = (goodsInfo: any) => {
   console.log(goodsInfo);
   router.push({
     path: '/declaration',
     query: goodsInfo
   })
+}
+
+//  复制商品Url
+const copyUrl = (goodsInfo: any) => {
+  copyInfo(goodsInfo.shoppingUrl);
 }
 
 </script>
@@ -67,7 +76,6 @@ const getDetail = (goodsInfo: any) => {
   background-color: #fff;
   padding: 10px 20px;
   border-radius: 10px;
-  margin-top: 10px;
 
   &:first-child {
     margin-top: 0;
@@ -103,7 +111,7 @@ const getDetail = (goodsInfo: any) => {
     align-items: center;
 
     .left {
-      font-size: 16px;
+      font-size: 15px;
     }
   }
 }

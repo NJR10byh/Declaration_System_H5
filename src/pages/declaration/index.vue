@@ -8,8 +8,8 @@
   <t-navbar title="报单" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
   <div class="declaration-container">
     <t-cell-group class="cellGroup" theme="card">
-      <t-cell title="商品名称" :note="goodsInfo.goodsName"/>
-      <t-cell title="剩余额度" :note="goodsInfo.remainingAmount"/>
+      <t-cell title="商品名称" :note="goodsInfo.commodity"/>
+      <t-cell title="剩余额度" :note="goodsInfo.remainAmount"/>
     </t-cell-group>
 
     <t-form

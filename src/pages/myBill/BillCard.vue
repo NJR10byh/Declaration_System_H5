@@ -8,8 +8,8 @@
   <div class="bill-card-container">
     <t-cell-group class="cellGroup" theme="card">
       <t-cell title="订单号" :note="billDetailInfo.orderId"/>
-      <t-cell title="商品名称" :note="billDetailInfo.goodsName"/>
-      <t-cell title="结算金额" :note="'¥'+billDetailInfo.goodsMoney"/>
+      <t-cell title="商品名称" :note="billDetailInfo.commodityName"/>
+      <t-cell title="结算金额" :note="'¥'+billDetailInfo.settlementAmount"/>
     </t-cell-group>
   </div>
 </template>

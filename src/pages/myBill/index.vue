@@ -8,8 +8,8 @@
   <t-navbar title="我的账单" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
   <div class="my-bill-container">
     <t-cell-group class="cellGroup" theme="card">
-      <t-cell v-for="(item,index) in billList" :key="index" :title="item.date" :note="'¥'+item.money" arrow
-              @click="getDetail(item)"/>
+      <t-cell v-for="(item,index) in billList" :key="index" :title="timestampToDateTime(item.payTime)"
+              :note="'¥'+item.settlementSum" arrow @click="getDetail(item)"/>
     </t-cell-group>
     <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
   </div>
@@ -24,10 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import {onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import {request} from "@/utils/request";
+import {BASE_URL} from "./constants";
+import {timestampToDateTime} from "@/utils/date";
 
-const route = useRoute();
 const router = useRouter();
 
 /**
@@ -39,16 +41,7 @@ const barList = ref([
   {value: 'user', label: '我的', icon: 'user'},
 ]);
 
-const billList = reactive([
-  {
-    date: "2021-08-14 14:44:50",
-    money: "1012",
-  },
-  {
-    date: "2021-08-15 17:12:20",
-    money: "4576",
-  }
-])
+const billList = ref([])
 
 /**
  * methods区
@@ -56,7 +49,7 @@ const billList = reactive([
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-
+  getMyBill();
 });
 
 /**
@@ -75,7 +68,19 @@ const switchTab = (item: any) => {
 /**
  * 业务相关
  */
-const getDetail = (item) => {
+const getMyBill = () => {
+  billList.value = [];
+  request.get({
+    url: BASE_URL.billList
+  }).then(res => {
+    console.log(res);
+    billList.value = res;
+  }).catch(err => {
+    console.log(err);
+  }).finally(() => {
+  })
+}
+const getDetail = (item: any) => {
   router.push({
     path: `/billDetail`,
     query: item

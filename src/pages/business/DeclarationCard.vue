@@ -10,45 +10,53 @@
       <template #header>
         <div class="declarationHeader">
           <div class="declarationTitle">
-            <t-tag variant="outline" theme="primary">1</t-tag>
-            <div>{{ declarationInfo.goodsName }}</div>
+            <t-tag variant="outline" theme="primary">{{ declarationInfo.index }}</t-tag>
+            <div>{{ declarationInfo.commodity }}</div>
           </div>
           <div class="declarationInfo">
-            <div>{{ declarationInfo.goodsNum }}</div>
-            <div>{{ declarationInfo.goodsDate }}</div>
+            <div>{{ declarationInfo.payAmount }}</div>
+            <div>{{ timestampToDateTime(declarationInfo.payTime) }}</div>
           </div>
           <div class="declarationOptions">
-            <t-tag variant="outline" theme="primary" style="margin-right: 0;">{{ declarationInfo.goodsStatus }}</t-tag>
+            <t-tag variant="light" theme="primary" style="margin-right: 0;">
+              {{ statusCodeToText(declarationInfo.status) }}
+            </t-tag>
           </div>
         </div>
       </template>
       <div class="declarationContent">
         <div class="contentInfo">
-          <div style="width: 50%;">订单号：</div>
-          <div style="width: 50%;">微信名：</div>
+          <div style="width: 100%;">订单号：{{ declarationInfo.orderId }}</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 50%;">实付金额：{{ declarationInfo.relMoney }}</div>
-          <div style="width: 50%;">预计返款金额：{{ declarationInfo.preBackMoney }}</div>
+          <div style="width: 100%;overflow: hidden;">微信名：{{ declarationInfo.userName }}</div>
+        </div>
+
+
+        <div class="contentInfo">
+          <div style="width: 50%;">实付金额：{{ declarationInfo.payAmount }} 元</div>
+          <div style="width: 50%;">预计返款金额：{{ declarationInfo.actualPayback }} 元</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 100%;">报单时间：</div>
+          <div style="width: 100%;">报单时间：{{ timestampToDateTime(declarationInfo.reportTime) }}</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 100%;">订单备注：</div>
+          <div style="width: 100%;">订单备注：{{ declarationInfo.examineNotes }}</div>
         </div>
         <div class="contentInfo" style="margin-top: 20px;">
-          <div style="width: 100%;">申请返款时间：</div>
+          <div style="width: 100%;">申请返款时间：{{ timestampToDateTime(declarationInfo.paybackTime) }}</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 100%;">结算ID：</div>
+          <div style="width: 100%;">结算ID：{{ declarationInfo.payStatId }}</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 50%;">结算时间：</div>
-          <div style="width: 50%;">结算金额：</div>
+          <div style="width: 100%;">结算时间：{{ timestampToDateTime(declarationInfo.payTime) }}</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 100%;">审核备注：</div>
+          <div style="width: 100%;">结算金额：{{ declarationInfo.settlementAmount }} 元</div>
+        </div>
+        <div class="contentInfo">
+          <div style="width: 100%;">审核备注：{{ declarationInfo.examineNotes }}</div>
         </div>
         <div class="contentBtns">
           <t-button theme="light" size="small" style="margin-right: 5px;">修改订单</t-button>
@@ -62,6 +70,8 @@
 <script setup lang="ts">
 import {onMounted, reactive} from "vue";
 import router from "@/router";
+import {timestampToDateTime} from "../../utils/date";
+import {statusCodeToText} from "../../utils/goodStatus";
 
 const props = defineProps({
   declarationInfo: Object
@@ -149,7 +159,7 @@ const applyBackMoney = (declarationInfo: any) => {
       justify-content: space-between;
       align-items: center;
       color: #999;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: bold;
     }
 

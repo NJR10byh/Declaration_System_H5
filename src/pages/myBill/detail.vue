@@ -8,15 +8,15 @@
   <t-navbar title="账单详情" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
   <div class="bill-detail-container">
     <t-cell-group class="cellGroup" theme="card">
-      <t-cell title="支付宝" note="17666661936"/>
-      <t-cell title="结算人" note="赵灵"/>
-      <t-cell title="结算时间" :note="billInfo.date"/>
-      <t-cell title="结算金额" :note="'¥'+billInfo.money"/>
+      <t-cell title="支付宝" :note="billDetailInfo.bankNum"/>
+      <t-cell title="结算人" :note="billDetailInfo.payUser"/>
+      <t-cell title="结算时间" :note="timestampToDateTime(billDetailInfo.payTime)"/>
+      <t-cell title="结算金额" :note="'¥'+billDetailInfo.settlementSum"/>
     </t-cell-group>
 
     <t-divider content="账单明细"/>
 
-    <BillCard v-for="(item,index) in billDetailList" :key="index" :billDetailInfo="item"/>
+    <BillCard v-for="(item,index) in billDetailInfo.commodityList" :key="index" :billDetailInfo="item"/>
     <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
   </div>
 </template>
@@ -25,6 +25,7 @@
 import {onMounted, reactive} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import BillCard from "@/pages/myBill/BillCard.vue";
+import {timestampToDateTime} from "@/utils/date";
 
 const route = useRoute();
 const router = useRouter();
@@ -33,24 +34,20 @@ const billInfo = route.query;
 /**
  * data
  */
-
-const billDetailList = reactive([
-  {
-    orderId: "8577879186728188461",
-    goodsName: "皇家美素佳儿4月",
-    goodsMoney: "301"
-  },
-  {
-    orderId: "577520088807537275",
-    goodsName: "皇家美素佳儿4月",
-    goodsMoney: "276.5"
-  },
-  {
-    orderId: "8577877833813490201",
-    goodsName: "皇家美素佳儿4月",
-    goodsMoney: "301"
-  }
-])
+const billDetailInfo = reactive({
+  bankNum: "622184010300710674",
+  payUser: "龙",
+  payTime: 1693030753,
+  settlementSum: 44.0,
+  commodityList: [
+    {
+      orderId: 333,
+      commodityName: "磊哥哥",
+      settlementAmount: 44.0,
+      payUser: "龙"
+    },
+  ]
+});
 
 /**
  * methods区

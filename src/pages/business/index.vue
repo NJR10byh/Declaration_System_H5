@@ -5,7 +5,7 @@
   * @version 0.8.0
 -->
 <template>
-  <t-tabs v-model="tabValue" :space-evenly="false" :sticky="true">
+  <t-tabs v-model="tabValue" :space-evenly="false" :sticky="true" @change="changeTab">
     <t-tab-panel value="今日" :badge-props="{ count: babgeCount.today, offset: [-8, 3] }" label="今日"/>
     <t-tab-panel value="全部" :badge-props="{ count: babgeCount.all, offset: [-8, 3] }" label="全部"/>
     <t-tab-panel value="已报单" :badge-props="{ count: babgeCount.declared, offset: [-8, 3] }" label="已报单"/>
@@ -17,18 +17,18 @@
   <div class="business-container">
     <div class="topSearch">
       <div style="width: 100%;padding:0 10px;">
-        <t-input v-model="searchData.goodsName" placeholder="请选择商品" readonly clearable
+        <t-input v-model="searchData.commodityName" placeholder="请选择商品" readonly clearable
                  style="border: 1px solid rgba(220, 220, 220, 1);border-radius: 6px;padding: 8px" @click="chooseGoods"
                  @onClear="goodsNameClear"/>
       </div>
       <div style="display: flex;justify-content:space-between;width: 100%;padding: 10px;">
         <t-search v-model="searchData.orderId" placeholder="请输入订单号" style="width: 75%" clearable/>
-        <t-button theme="primary" style="width: 20%">搜索</t-button>
+        <t-button theme="primary" style="width: 20%" @click="search">搜索</t-button>
       </div>
       <div style="display: flex;justify-content:space-between;width: 100%;padding: 10px 20px;">
-        <div>报单数量：<span style="color: var(--td-brand-color-8)">{{ pageInfo.declarationNum }}</span></div>
-        <div>实付：<span style="color: var(--td-brand-color-8)">¥{{ pageInfo.relMoney }}</span></div>
-        <div>返款：<span style="color: var(--td-brand-color-8)">¥{{ pageInfo.backMoney }}</span></div>
+        <div>报单数量：<span style="color: var(--td-brand-color-8)">{{ pageInfo.reportNum }}</span></div>
+        <div>实付：<span style="color: var(--td-brand-color-8)">¥{{ pageInfo.payAmount }}</span></div>
+        <div>返款：<span style="color: var(--td-brand-color-8)">¥{{ pageInfo.actualPayback }}</span></div>
       </div>
     </div>
 
@@ -37,31 +37,17 @@
       <DeclarationCard :key="index" :declarationInfo="item"/>
     </div>
 
+    <t-loading theme="dots" size="40px" style="margin-top: 10px;" :loading="loading"/>
+
 
     <t-popup v-model="goodsListVisible" placement="bottom" style="padding: 10px;max-height: 70vh;overflow: scroll;">
       <div style="width: 100%;display: flex;justify-content: center;align-items: center;">
-        <t-search v-model="searchData.orderId" placeholder="请输入搜索关键词" clearable style="width: 100%"/>
+        <t-search placeholder="请输入搜索关键词" clearable style="width: 100%"/>
       </div>
-      <t-radio-group v-model:value="searchData.goodsName">
-        <t-radio name="radio" value="商品1" label="商品1" placement="right"/>
-        <t-radio name="radio" value="商品2" label="商品2" placement="right"/>
-        <t-radio name="radio" value="商品3" label="商品3" placement="right"/>
-        <t-radio name="radio" value="商品4" label="商品4" placement="right"/>
-        <t-radio name="radio" value="商品5" label="商品5" placement="right"/>
-        <t-radio name="radio" value="商品6" label="商品6" placement="right"/>
-        <t-radio name="radio" value="商品7" label="商品7" placement="right"/>
-        <t-radio name="radio" value="商品8" label="商品8" placement="right"/>
-        <t-radio name="radio" value="商品9" label="商品9" placement="right"/>
-        <t-radio name="radio" value="商品10" label="商品10" placement="right"/>
-        <t-radio name="radio" value="商品11" label="商品11" placement="right"/>
-        <t-radio name="radio" value="商品12" label="商品12" placement="right"/>
-        <t-radio name="radio" value="商品13" label="商品13" placement="right"/>
-        <t-radio name="radio" value="商品14" label="商品14" placement="right"/>
-        <t-radio name="radio" value="商品15" label="商品15" placement="right"/>
-        <t-radio name="radio" value="商品16" label="商品16" placement="right"/>
+      <t-radio-group v-model:value="searchData.commodityName">
+        <t-radio v-for="item in declarationList" :value="item.commodity" :label="item.commodity" placement="right"/>
       </t-radio-group>
     </t-popup>
-    <t-loading theme="spinner" text="加载中..." :loading="loading"/>
   </div>
   <t-tab-bar v-model="barValue" :split="false">
     <t-tab-bar-item v-for="item in barList" :key="item.value" :value="item.value" @click="switchTab(item)">
@@ -78,6 +64,9 @@ import {onMounted, reactive, ref} from "vue";
 import {useRoute} from "vue-router";
 import router from "@/router";
 import DeclarationCard from "@/pages/business/DeclarationCard.vue";
+import {request} from "@/utils/request";
+import {BASE_URL} from "./constants";
+import {statusTextToCode} from "@/utils/goodStatus";
 
 const route = useRoute();
 
@@ -89,6 +78,8 @@ const barList = ref([
   {value: 'home', label: '首页', icon: 'home'},
   {value: 'user', label: '我的', icon: 'user'},
 ]);
+
+const loading = ref(false);
 
 const tabValue = ref(route.query.page);
 const babgeCount = reactive({
@@ -102,39 +93,32 @@ const babgeCount = reactive({
 })
 
 const searchData = reactive({
-  goodsName: "商品4",
+  commodityName: "",
   orderId: "",
+  status: 0,
 })
 
-const pageInfo = reactive({
-  declarationNum: "1",
-  relMoney: "1012",
-  backMoney: "2000"
-})
-
-const declarationList = reactive([
+const goodsOptions = [
   {
-    goodsName: "蒙牛早餐奶（社群专属）",
-    goodsNum: "11",
-    goodsDate: "03-30",
-    goodsStatus: "已报单",
-    relMoney: "1012",
-    preBackMoney: "2000"
+    value: '1',
+    label: '选项禁用-已选',
+    placement: "right"
   },
   {
-    goodsName: "蒙牛早餐奶（社群专属）",
-    goodsNum: "11",
-    goodsDate: "03-29",
-    goodsStatus: "未报单",
-    relMoney: "1012",
-    preBackMoney: "2000"
-  }
-])
+    value: '2',
+    label: '选项禁用-默认',
+  },
+];
+
+const pageInfo = reactive({
+  reportNum: 0,
+  payAmount: 0,
+  actualPayback: 0
+})
+
+const declarationList = ref([])
 
 const goodsListVisible = ref(false);
-
-
-const loading = ref(false);
 
 /**
  * methods区
@@ -142,11 +126,17 @@ const loading = ref(false);
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
+  getList();
 });
 
 /**
  * 操作钩子
  */
+const changeTab = (value: any) => {
+  console.log(value);
+  searchData.status = statusTextToCode(value.toString())
+  getList();
+};
 // 切换tab
 const switchTab = (item: any) => {
   router.push({
@@ -164,6 +154,32 @@ const goodsNameClear = () => {
 /**
  * 业务相关
  */
+const getList = () => {
+  declarationList.value = [];
+  searchData.status = statusTextToCode(tabValue.value.toString())
+  loading.value = true;
+  request.post({
+    url: BASE_URL.showList,
+    data: searchData
+  }).then(res => {
+    console.log(res)
+    declarationList.value = res.reportVOList;
+    declarationList.value.map((item, index) => {
+      item.index = index + 1;
+    })
+    pageInfo.reportNum = res.reportNum;
+    pageInfo.payAmount = res.payAmount;
+    pageInfo.actualPayback = res.actualPayback;
+  }).catch(err => {
+    console.log(err);
+  }).finally(() => {
+    loading.value = false;
+  });
+}
+
+const search = () => {
+  getList();
+}
 </script>
 
 <style lang="less" scoped>
