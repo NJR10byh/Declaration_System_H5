@@ -7,12 +7,14 @@
 <template>
   <t-navbar title="账单详情" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
   <div class="bill-detail-container">
-    <t-cell-group class="cellGroup" theme="card">
-      <t-cell title="支付宝" :note="billDetailInfo.bankNum"/>
-      <t-cell title="结算人" :note="billDetailInfo.payUser"/>
-      <t-cell title="结算时间" :note="timestampToDateTime(billDetailInfo.payTime)"/>
-      <t-cell title="结算金额" :note="'¥'+billDetailInfo.settlementSum"/>
-    </t-cell-group>
+    <div class="cellGroup">
+      <t-cell-group theme="card">
+        <t-cell title="支付宝" :note="billDetailInfo.bankNum"/>
+        <t-cell title="结算人" :note="billDetailInfo.payUser"/>
+        <t-cell title="结算时间" :note="timestampToDateTime(billDetailInfo.payTime)"/>
+        <t-cell title="结算金额" :note="'¥'+billDetailInfo.settlementSum"/>
+      </t-cell-group>
+    </div>
 
     <t-divider content="账单明细"/>
 
@@ -89,7 +91,7 @@ const getDetail = (item) => {
   padding-bottom: 20px;
 
   .cellGroup {
-    width: 90%;
+    width: 100%;
     margin-top: 58px;
     margin-bottom: 10px;
   }

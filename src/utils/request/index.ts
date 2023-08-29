@@ -40,7 +40,6 @@ const transform: AxiosTransform = {
         }
 
         //  这里 code为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
-        // @ts-ignore
         const {code} = data;
 
         // 这里逻辑可以根据项目进行修改
@@ -49,7 +48,7 @@ const transform: AxiosTransform = {
             return data.data;
         }
 
-        throw new Error(data.data.errMsg);
+        throw new Error(data.msg);
     },
 
     // 请求前处理配置
@@ -108,17 +107,17 @@ const transform: AxiosTransform = {
     },
 
     // 请求拦截器处理
-    // requestInterceptors: (config, options) => {
-    //   // 请求之前处理config
-    //   const token = localStorage.getItem(TOKEN_NAME);
-    //   if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
-    //     // jwt token
-    //     (config as Recordable).headers.Authorization = options.authenticationScheme
-    //       ? `${options.authenticationScheme} ${token}`
-    //       : token;
-    //   }
-    //   return config;
-    // },
+    requestInterceptors: (config, options) => {
+        // 请求之前处理config
+        const token = localStorage.getItem("token");
+        if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
+            // jwt token
+            (config as Recordable).headers.token = options.authenticationScheme
+                ? `${options.authenticationScheme} ${token}`
+                : token;
+        }
+        return config;
+    },
 
     // 响应拦截器处理
     responseInterceptors: (res) => {

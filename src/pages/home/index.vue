@@ -22,6 +22,7 @@
       v-model="refreshing"
       :loading-bar-height="66"
       :loading-texts="['下拉刷新', '松开刷新', '正在刷新', '刷新完成']"
+      :loading-props="{theme: 'spinner'}"
       @refresh="handleRefresh"
       @scrolltolower="handleScrolltolower"
   >
@@ -29,7 +30,8 @@
       <div class="goodsList" v-for="(item,index) in goodsList">
         <GoodsCard :key="index" :goodsInfo="item"/>
       </div>
-      <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
+      <t-loading theme="dots" size="40px" style="margin-top: 10px;" :loading="loading" v-show="loading"/>
+      <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;" :loading="!loading" v-show="!loading"/>
     </div>
   </t-pull-down-refresh>
   <t-tab-bar v-model="barValue" :split="false">
@@ -61,6 +63,10 @@ const barList = ref([
 
 // 下拉刷新状态
 const refreshing = ref(false);
+
+// 加载状态
+const loading = ref(false);
+
 // 搜索框的值
 const searchValue = ref('');
 
@@ -101,6 +107,7 @@ const handleScrolltolower = () => {
  */
 const getGoodsList = () => {
   goodsList.value = [];
+  loading.value = true;
   request.get({
     url: setObjToUrlParams(BASE_URL.queryList, {keyWord: searchValue.value})
   }).then(res => {
@@ -110,6 +117,7 @@ const getGoodsList = () => {
     console.log(err);
   }).finally(() => {
     refreshing.value = false;
+    loading.value = false;
   })
 }
 // 搜索商品

@@ -5,5 +5,7 @@
  * @version 0.1.0
  */
 export const BASE_URL = {
-    showList: "/showList"
+    showList: "/showList",
+    getCommodityNames: "/getCommodityNames",
+    applyForRefund: "/applyForRefund",
 };

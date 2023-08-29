@@ -9,56 +9,60 @@
     <t-avatar image="https://tdesign.gtimg.com/mobile/demos/avatar_1.png" size="large"
               style="margin-top: 60px"></t-avatar>
     <div style="margin-top: 10px;font-size: 15px;color: #888;">测试用户</div>
-    <t-grid :column="4" theme="card" class="grid-demo" border>
-      <t-grid-item text="已报单" @click="to_business('已报单')">
-        <template #image>
-          <t-icon name="file" size="2em"/>
-        </template>
-      </t-grid-item>
-      <t-grid-item text="待审核" @click="to_business('待审核')">
-        <template #image>
-          <t-icon name="info-circle" size="2em"/>
-        </template>
-      </t-grid-item>
-      <t-grid-item text="待返款" @click="to_business('待返款')">
-        <template #image>
-          <t-icon name="money-circle" size="2em"/>
-        </template>
-      </t-grid-item>
-      <t-grid-item text="已返款" @click="to_business('已返款')">
-        <template #image>
-          <t-icon name="check-circle" size="2em"/>
-        </template>
-      </t-grid-item>
-    </t-grid>
+    <div class="grid-demo">
+      <t-grid :column="4" theme="card" border>
+        <t-grid-item text="已报单" @click="to_business('已报单')">
+          <template #image>
+            <t-icon name="task-checked" size="2em"/>
+          </template>
+        </t-grid-item>
+        <t-grid-item text="待审核" @click="to_business('待审核')">
+          <template #image>
+            <t-icon name="info-circle" size="2em"/>
+          </template>
+        </t-grid-item>
+        <t-grid-item text="待返款" @click="to_business('待返款')">
+          <template #image>
+            <t-icon name="wallet" size="2em"/>
+          </template>
+        </t-grid-item>
+        <t-grid-item text="已返款" @click="to_business('已返款')">
+          <template #image>
+            <t-icon name="check-circle" size="2em"/>
+          </template>
+        </t-grid-item>
+      </t-grid>
+    </div>
 
-    <t-cell-group theme="card" class="cellGroup">
-      <t-cell title="我的报单" arrow @click="to_business('全部')">
-        <template #leftIcon>
-          <t-icon name="view-module"/>
-        </template>
-      </t-cell>
-      <t-cell title="我的账单" arrow @click="to_myBill">
-        <template #leftIcon>
-          <t-icon name="root-list"/>
-        </template>
-      </t-cell>
-      <t-cell title="个人信息" arrow @click="to_userInfo">
-        <template #leftIcon>
-          <t-icon name="user"/>
-        </template>
-      </t-cell>
-      <t-cell title="修改密码" arrow @click="to_changePassword">
-        <template #leftIcon>
-          <t-icon name="tools"/>
-        </template>
-      </t-cell>
-      <t-cell title="退出登录" arrow @click="handleLogout">
-        <template #leftIcon>
-          <t-icon name="logout"/>
-        </template>
-      </t-cell>
-    </t-cell-group>
+    <div class="cell-group">
+      <t-cell-group theme="card">
+        <t-cell title="我的报单" arrow @click="to_business('全部')">
+          <template #leftIcon>
+            <t-icon name="catalog"/>
+          </template>
+        </t-cell>
+        <t-cell title="我的账单" arrow @click="to_myBill">
+          <template #leftIcon>
+            <t-icon name="root-list"/>
+          </template>
+        </t-cell>
+        <t-cell title="个人信息" arrow @click="to_userInfo">
+          <template #leftIcon>
+            <t-icon name="user"/>
+          </template>
+        </t-cell>
+        <t-cell title="修改密码" arrow @click="to_changePassword">
+          <template #leftIcon>
+            <t-icon name="rotate-locked"/>
+          </template>
+        </t-cell>
+        <t-cell title="退出登录" arrow @click="handleLogout">
+          <template #leftIcon>
+            <t-icon name="logout"/>
+          </template>
+        </t-cell>
+      </t-cell-group>
+    </div>
   </div>
   <t-tab-bar v-model="barValue" :split="false">
     <t-tab-bar-item v-for="item in barList" :key="item.value" :value="item.value" @click="switchTab(item)">
@@ -73,6 +77,8 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
 import router from "@/router";
+import {request} from "@/utils/request";
+import {Toast} from "tdesign-mobile-vue";
 
 /**
  * data
@@ -126,8 +132,18 @@ const to_changePassword = () => {
 }
 
 const handleLogout = async () => {
-  await router.push("/login");
-  window.location.reload();
+  request.post({
+    url: "/logout"
+  }).then(res => {
+    if (res.code === 200) {
+      Toast.success("登出成功")
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  }).catch(err => {
+    Toast.error(err.message)
+  }).finally(() => {
+  });
 };
 </script>
 
@@ -142,7 +158,7 @@ const handleLogout = async () => {
   align-items: center;
 
   .grid-demo {
-    width: 90%;
+    width: 100%;
     margin-top: 70px;
 
     .t-grid-item /deep/ .t-grid-item__image {
@@ -150,9 +166,9 @@ const handleLogout = async () => {
     }
   }
 
-  .cellGroup {
-    width: 90%;
-    margin-top: 10px;
+  .cell-group {
+    width: 100%;
+    margin-top: 15px;
 
     .t-icon {
       color: #000;

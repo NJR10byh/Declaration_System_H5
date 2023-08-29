@@ -6,9 +6,10 @@
  */
 import {getPermissionStore, getUserStore, usePermissionStore, useUserStore} from "@/store";
 import {Toast} from "tdesign-mobile-vue";
-import {reactive} from "vue";
+import {h, reactive} from "vue";
 import {isNotEmpty} from "@/utils/validate";
 import router from "@/router";
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 
 const userStore = useUserStore();
 const permissionStore = usePermissionStore();
@@ -50,7 +51,12 @@ export const userInfoToCache = async (info: any) => {
     userStore.getUserInfo(userInfo);
     await permissionStore.initRoutes(info.role);
 
-    Toast.success("欢迎您，" + info.userName)
+    Toast({
+        icon: () => h(ErrorCircleIcon),
+        theme: "success",
+        direction: 'column',
+        message: "欢迎您，" + info.userName,
+    });
     await router.push("/home");
 };
 

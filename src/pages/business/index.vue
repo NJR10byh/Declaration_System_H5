@@ -23,7 +23,7 @@
       </div>
       <div style="display: flex;justify-content:space-between;width: 100%;padding: 10px;">
         <t-search v-model="searchData.orderId" placeholder="请输入订单号" style="width: 75%" clearable/>
-        <t-button theme="primary" style="width: 20%" @click="search">搜索</t-button>
+        <t-button theme="primary" style="width: 20%" @click="getList()">搜索</t-button>
       </div>
       <div style="display: flex;justify-content:space-between;width: 100%;padding: 10px 20px;">
         <div>报单数量：<span style="color: var(--td-brand-color-8)">{{ pageInfo.reportNum }}</span></div>
@@ -39,13 +39,12 @@
 
     <t-loading theme="dots" size="40px" style="margin-top: 10px;" :loading="loading"/>
 
-
     <t-popup v-model="goodsListVisible" placement="bottom" style="padding: 10px;max-height: 70vh;overflow: scroll;">
       <div style="width: 100%;display: flex;justify-content: center;align-items: center;">
         <t-search placeholder="请输入搜索关键词" clearable style="width: 100%"/>
       </div>
       <t-radio-group v-model:value="searchData.commodityName">
-        <t-radio v-for="item in declarationList" :value="item.commodity" :label="item.commodity" placement="right"/>
+        <t-radio v-for="item in goodsList" :value="item" :label="item" placement="right"/>
       </t-radio-group>
     </t-popup>
   </div>
@@ -76,7 +75,7 @@ const route = useRoute();
 const barValue = ref('');
 const barList = ref([
   {value: 'home', label: '首页', icon: 'home'},
-  {value: 'user', label: '我的', icon: 'user'},
+  {value: 'user', label: '我的', icon: 'user'}
 ]);
 
 const loading = ref(false);
@@ -98,26 +97,14 @@ const searchData = reactive({
   status: 0,
 })
 
-const goodsOptions = [
-  {
-    value: '1',
-    label: '选项禁用-已选',
-    placement: "right"
-  },
-  {
-    value: '2',
-    label: '选项禁用-默认',
-  },
-];
-
 const pageInfo = reactive({
   reportNum: 0,
   payAmount: 0,
   actualPayback: 0
 })
 
-const declarationList = ref([])
-
+const declarationList = ref([]);
+const goodsList = ref([]);
 const goodsListVisible = ref(false);
 
 /**
@@ -127,6 +114,7 @@ const goodsListVisible = ref(false);
 // 组件挂载完成后执行
 onMounted(() => {
   getList();
+  getCommodityNames();
 });
 
 /**
@@ -176,10 +164,19 @@ const getList = () => {
     loading.value = false;
   });
 }
-
-const search = () => {
-  getList();
+const getCommodityNames = () => {
+  request.get({
+    url: BASE_URL.getCommodityNames,
+  }).then(res => {
+    console.log(res)
+    goodsList.value = res;
+  }).catch(err => {
+    console.log(err);
+  }).finally(() => {
+  });
 }
+
+
 </script>
 
 <style lang="less" scoped>

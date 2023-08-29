@@ -7,10 +7,12 @@
 <template>
   <t-navbar title="我的账单" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
   <div class="my-bill-container">
-    <t-cell-group class="cellGroup" theme="card">
-      <t-cell v-for="(item,index) in billList" :key="index" :title="timestampToDateTime(item.payTime)"
-              :note="'¥'+item.settlementSum" arrow @click="getDetail(item)"/>
-    </t-cell-group>
+    <div class="cellGroup">
+      <t-cell-group theme="card">
+        <t-cell v-for="(item,index) in billList" :key="index" :title="timestampToDateTime(item.payTime)"
+                :note="'¥'+item.settlementSum" arrow @click="getDetail(item)"/>
+      </t-cell-group>
+    </div>
     <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
   </div>
   <t-tab-bar v-model="barValue" :split="false">
@@ -100,7 +102,7 @@ const getDetail = (item: any) => {
   padding-bottom: 20px;
 
   .cellGroup {
-    width: 90%;
+    width: 100%;
     margin-top: 58px;
   }
 }

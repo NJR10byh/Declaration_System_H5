@@ -59,19 +59,34 @@
           <div style="width: 100%;">审核备注：{{ declarationInfo.examineNotes }}</div>
         </div>
         <div class="contentBtns">
-          <t-button theme="light" size="small" style="margin-right: 5px;">修改订单</t-button>
+          <t-button theme="light" size="small" style="margin-right: 5px;" @click="editOrder(declarationInfo)">修改订单
+          </t-button>
           <t-button theme="primary" size="small" @click="applyBackMoney(declarationInfo)">申请返款</t-button>
         </div>
       </div>
     </t-collapse-panel>
   </t-collapse>
+
+  <t-dialog
+      v-model:visible="applyForRefundDialog.visible"
+      close-on-overlay-click
+      title="物流单号"
+      :cancel-btn="applyForRefundDialog.cancelBtn"
+      :confirm-btn="applyForRefundDialog.confirmBtn"
+      @confirm="applyForRefund"
+      class="applyForRefundDialogStyle"
+  >
+    <t-input placeholder="请填写物流单号" v-model="applyForRefundFormData.trackNum"/>
+  </t-dialog>
 </template>
 
 <script setup lang="ts">
 import {onMounted, reactive} from "vue";
-import router from "@/router";
 import {timestampToDateTime} from "../../utils/date";
 import {statusCodeToText} from "../../utils/goodStatus";
+import {request} from "@/utils/request";
+import {BASE_URL} from "./constants";
+import {Toast} from "tdesign-mobile-vue";
 
 const props = defineProps({
   declarationInfo: Object
@@ -81,13 +96,45 @@ const props = defineProps({
  */
 const declarationInfo = reactive(props.declarationInfo);
 
+const applyForRefundFormData = reactive({
+  actualPayback: "",
+  applyPaybackTime: "",
+  commodityId: "",
+  examineNotes: "",
+  examineTime: "",
+  finishPic: "",
+  notes: "",
+  orderId: "",
+  orderPic: "",
+  payAmount: "",
+  payStatId: "",
+  paybackTime: "",
+  reportTime: "",
+  reporterId: "",
+  status: "",
+  trackNum: ""
+})
+const applyForRefundDialog = reactive({
+  visible: false,
+  confirmBtn: {
+    content: '确认',
+    variant: 'text',
+    size: 'large',
+  },
+  cancelBtn: {
+    content: '取消',
+    variant: 'text',
+    size: 'large',
+  },
+})
+
 /**
  * methods区
  */
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-
+  Object.assign(applyForRefundFormData, declarationInfo);
 });
 
 /**
@@ -97,11 +144,41 @@ onMounted(() => {
 /**
  * 业务相关
  */
+// 修改订单
+const editOrder = (declarationInfo: any) => {
+  console.log(declarationInfo);
+
+}
+// 申请返款
 const applyBackMoney = (declarationInfo: any) => {
   console.log(declarationInfo);
-  router.push({
-    path: '/applyBackMoney',
-    query: declarationInfo
+  applyForRefundDialog.visible = true;
+}
+// 申请返款确认
+const applyForRefund = () => {
+  console.log(applyForRefundFormData)
+  if (!applyForRefundFormData.trackNum) {
+    Toast({
+      theme: "error",
+      direction: 'column',
+      message: "请填写物流单号",
+    });
+    return;
+  }
+  request.post({
+    url: BASE_URL.applyForRefund,
+    data: applyForRefundFormData
+  }).then(res => {
+    console.log(res);
+    Toast({
+      theme: "success",
+      direction: 'column',
+      message: "申请返款成功",
+    });
+  }).catch(err => {
+    console.log(err);
+  }).finally(() => {
+    applyForRefundDialog.visible = false;
   })
 }
 </script>
@@ -171,4 +248,14 @@ const applyBackMoney = (declarationInfo: any) => {
     }
   }
 }
+
+.applyForRefundDialogStyle {
+  .t-input {
+    margin-top: 16px;
+    --td-input-vertical-padding: 12px;
+    --td-bg-color-container: #f3f3f3;
+    border-radius: 6px;
+  }
+}
+
 </style>

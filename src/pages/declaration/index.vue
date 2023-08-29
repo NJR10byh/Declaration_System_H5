@@ -7,69 +7,79 @@
 <template>
   <t-navbar title="报单" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
   <div class="declaration-container">
-    <t-cell-group class="cellGroup" theme="card">
-      <t-cell title="商品名称" :note="goodsInfo.commodity"/>
-      <t-cell title="剩余额度" :note="goodsInfo.remainAmount"/>
-    </t-cell-group>
+    <div class="cellGroup">
+      <t-cell-group theme="card">
+        <t-cell title="商品名称" :note="goodsInfo.commodity"/>
+        <t-cell title="剩余额度" :note="goodsInfo.remainAmount"/>
+      </t-cell-group>
+    </div>
 
-    <t-form
-        ref="form"
-        :data="declarationFormData"
-        :rules="declarationRules"
-        reset-type="initial"
-        labelWidth="110px"
-        show-error-message
-        label-align="left"
-        @submit="declarationFormSubmit"
-        class="formStyle"
-    >
-      <t-form-item label="微信名">
-        <t-input v-model="declarationFormData.wechatName" borderless placeholder="请输入微信名"/>
-      </t-form-item>
-      <t-form-item label="订单号">
-        <t-input v-model="declarationFormData.orderId" borderless placeholder="请输入订单号"/>
-      </t-form-item>
-      <t-form-item label="实付金额">
-        <t-input v-model="declarationFormData.relMoney" borderless placeholder="请输入实付金额"/>
-      </t-form-item>
-      <t-form-item label="预计返款金额">
-        <t-input v-model="declarationFormData.preBackMoney" borderless placeholder="请输入预计返款金额" readonly>
-          <template #suffixIcon>
-            <div style="font-size: 15px">元</div>
-          </template>
-        </t-input>
-      </t-form-item>
-      <t-form-item label="备注">
-        <t-textarea v-model="declarationFormData.remark" borderless placeholder="请输入备注" :maxlength="50" indicator/>
-      </t-form-item>
-      <t-form-item label="下单图" style="display: flex;flex-direction: column">
-        <div style="display: flex;flex-direction: column;justify-content: flex-start;align-items: center;">
-          <t-upload
-              v-model="declarationFormData.orderPic"
-              :multiple="false"
-              :max="1"
-              :size-limit="{ size: 3000000, unit: 'B' }"
-              accept="image/*"
-              action="//service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
-              @validate="onValidate"
-          />
-          <div style="margin-top: 10px;font-size: 13px;color: red;">
-            下单截图尽量拼成一张图，图片要看到订单号/金额/下单时间，辛苦各位小宝贝～
+    <div style="width: 90%">
+      <t-form
+          ref="form"
+          class="formStyle"
+          :data="declarationForm.formData"
+          :rules="declarationForm.formDataRules"
+          reset-type="initial"
+          labelWidth="110px"
+          label-align="left"
+          requiredMark
+          @submit="declarationFormSubmit"
+      >
+        <t-form-item label="微信名" name="userName">
+          <t-input v-model="declarationForm.formData.userName" borderless placeholder="请输入微信名"/>
+        </t-form-item>
+        <t-form-item label="订单号" name="orderId">
+          <t-input v-model="declarationForm.formData.orderId" borderless placeholder="请输入订单号"/>
+        </t-form-item>
+        <t-form-item label="实付金额" name="payAmount">
+          <t-input v-model="declarationForm.formData.payAmount" borderless placeholder="请输入实付金额"/>
+        </t-form-item>
+        <t-form-item label="预计返款金额" name="expectPayback">
+          <t-input v-model="declarationForm.formData.expectPayback" borderless placeholder="请输入预计返款金额"
+                   readonly>
+            <template #suffixIcon>
+              <div style="font-size: 15px">元</div>
+            </template>
+          </t-input>
+        </t-form-item>
+        <t-form-item label="备注" name="notes">
+          <t-textarea v-model="declarationForm.formData.notes" borderless placeholder="请输入备注" :maxlength="50"
+                      indicator/>
+        </t-form-item>
+        <t-form-item label="下单图" style="display: flex;flex-direction: column" name="orderPic">
+          <div style="display: flex;flex-direction: column;justify-content: flex-start;align-items: center;">
+            <t-upload
+                v-model="declarationForm.formData.orderPic"
+                :multiple="false"
+                :max="1"
+                :size-limit="{ size: 3000000, unit: 'B' }"
+                accept="image/*"
+                action="//service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
+                @validate="onValidate"
+            />
+            <div style="margin-top: 10px;font-size: 13px;color: red;">
+              下单截图尽量拼成一张图，图片要看到订单号/金额/下单时间，辛苦各位小宝贝～
+            </div>
           </div>
+        </t-form-item>
+        <div class="button-group">
+          <t-button theme="primary" variant="outline" @click="to_home">首页</t-button>
+          <t-button theme="primary" type="submit" :loading="declarationForm.submitBtnLoading"
+                    :loading-props="{theme: 'dots'}">提交
+          </t-button>
         </div>
-      </t-form-item>
-      <div class="button-group">
-        <t-button theme="primary" variant="outline" @click="to_home">首页</t-button>
-        <t-button theme="primary" type="submit">提交</t-button>
-      </div>
-    </t-form>
+      </t-form>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {onMounted, reactive} from "vue";
-import {Message} from "tdesign-mobile-vue";
+import {Message, Toast} from "tdesign-mobile-vue";
 import {useRoute, useRouter} from "vue-router";
+import {request} from "@/utils/request";
+import {BASE_URL} from "@/pages/login/constants";
 
 const route = useRoute();
 const router = useRouter();
@@ -82,18 +92,34 @@ const goodsInfo = route.query;
 /**
  * data
  */
-// 报单表单数据
-const declarationFormData = reactive({
-  wechatName: "",
-  orderId: "",
-  relMoney: "",
-  preBackMoney: 0,
-  remark: "",
-  orderPic: "",
+const declarationForm = reactive({
+  formData: {
+    userName: "",
+    commodityId: "",
+    expectPayback: "",
+    notes: "",
+    orderId: "",
+    orderPic: "",
+    payAmount: "",
+    reportTime: "",
+    reporterId: "",
+    status: ""
+  },
+  formDataRules: {
+    userName: [{required: true, message: "微信名必填", type: "error"}],
+    commodityId: [{required: true, message: "商品id必填", type: "error"}],
+    expectPayback: [{required: true, message: "预计返款金额必填", type: "error"}],
+    notes: [{required: true, message: "备注必填", type: "error"}],
+    orderId: [{required: true, message: "订单号必填", type: "error"}],
+    orderPic: [{required: true, message: "下单图必填", type: "error"}],
+    payAmount: [{required: true, message: "实付金额必填", type: "error"}],
+    reportTime: [{required: true, message: "报单时间必填", type: "error"}],
+    reporterId: [{required: true, message: "报单人id必填", type: "error"}],
+    status: [{required: true, message: "状态必填", type: "error"}],
+  },
+  submitBtnLoading: false
 })
 
-// 报单表单校验
-const declarationRules = reactive([])
 /**
  * methods区
  */
@@ -116,8 +142,28 @@ const onValidate = (context: any) => {
   }
 };
 
-const declarationFormSubmit = () => {
-  console.log(declarationFormData)
+// 提交
+const declarationFormSubmit = ({validateResult}) => {
+  console.log(declarationForm.formData)
+  if (validateResult) {
+    declarationForm.submitBtnLoading = true;
+    request.post({
+      url: BASE_URL.register,
+      data: declarationForm.formData
+    }).then(res => {
+      console.log(res);
+      Toast({
+        theme: "success",
+        direction: 'column',
+        message: "报单成功",
+      });
+      router.push("/home");
+    }).catch(err => {
+      console.log(err);
+    }).finally(() => {
+      declarationForm.submitBtnLoading = false;
+    })
+  }
 }
 
 /**
@@ -137,9 +183,10 @@ const to_home = () => {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  padding-bottom: 30px;
 
   .cellGroup {
-    width: 90%;
+    width: 100%;
     margin-top: 58px;
 
     .t-input {
@@ -149,7 +196,7 @@ const to_home = () => {
   }
 
   .formStyle {
-    width: 90%;
+    width: 100%;
     border-radius: 10px;
     margin-top: 10px;
 
