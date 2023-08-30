@@ -26,9 +26,6 @@
           requiredMark
           @submit="declarationFormSubmit"
       >
-        <t-form-item label="微信名" name="userName">
-          <t-input v-model="declarationForm.formData.userName" borderless placeholder="请输入微信名"/>
-        </t-form-item>
         <t-form-item label="订单号" name="orderId">
           <t-input v-model="declarationForm.formData.orderId" borderless placeholder="请输入订单号"/>
         </t-form-item>
@@ -74,11 +71,12 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive} from "vue";
+import {h, onMounted, reactive} from "vue";
 import {Message, Toast} from "tdesign-mobile-vue";
 import {useRoute, useRouter} from "vue-router";
 import {request} from "@/utils/request";
 import {BASE_URL} from "@/pages/login/constants";
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 
 const route = useRoute();
 const router = useRouter();
@@ -105,7 +103,6 @@ const declarationForm = reactive({
     status: ""
   },
   formDataRules: {
-    userName: [{required: true, message: "微信名必填", type: "error"}],
     commodityId: [{required: true, message: "商品id必填", type: "error"}],
     expectPayback: [{required: true, message: "预计返款金额必填", type: "error"}],
     notes: [{required: true, message: "备注必填", type: "error"}],
