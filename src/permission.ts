@@ -2,8 +2,10 @@ import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
 import {getPermissionStore, getUserStore} from "@/store";
 import router from "@/router";
-import {MessagePlugin} from "tdesign-mobile-vue";
+import {Toast} from "tdesign-mobile-vue";
 import {isEmpty} from "@/utils/validate";
+import {h} from "vue/dist/vue";
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 
 NProgress.configure({showSpinner: false});
 
@@ -57,7 +59,12 @@ router.beforeEach(async (to, from, next) => {
         try {
             next("/result/403");
         } catch (error) {
-            await MessagePlugin.error(error);
+            Toast({
+                icon: () => h(ErrorCircleIcon),
+                theme: "error",
+                direction: 'column',
+                message: error,
+            });
             NProgress.done();
         }
     }

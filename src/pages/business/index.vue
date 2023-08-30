@@ -159,7 +159,12 @@ const getList = () => {
     pageInfo.payAmount = res.payAmount;
     pageInfo.actualPayback = res.actualPayback;
   }).catch(err => {
-    console.log(err);
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      theme: "error",
+      direction: 'column',
+      message: err.message,
+    });
   }).finally(() => {
     loading.value = false;
   });
@@ -171,7 +176,12 @@ const getCommodityNames = () => {
     console.log(res)
     goodsList.value = res;
   }).catch(err => {
-    console.log(err);
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      theme: "error",
+      direction: 'column',
+      message: err.message,
+    });
   }).finally(() => {
   });
 }

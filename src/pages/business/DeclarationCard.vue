@@ -176,7 +176,12 @@ const applyForRefund = () => {
       message: "申请返款成功",
     });
   }).catch(err => {
-    console.log(err);
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      theme: "error",
+      direction: 'column',
+      message: err.message,
+    });
   }).finally(() => {
     applyForRefundDialog.visible = false;
   })

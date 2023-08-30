@@ -158,7 +158,12 @@ const declarationFormSubmit = ({validateResult}) => {
       });
       router.push("/home");
     }).catch(err => {
-      console.log(err);
+      Toast({
+        icon: () => h(ErrorCircleIcon),
+        theme: "error",
+        direction: 'column',
+        message: err.message,
+      });
     }).finally(() => {
       declarationForm.submitBtnLoading = false;
     })

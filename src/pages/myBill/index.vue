@@ -78,7 +78,12 @@ const getMyBill = () => {
     console.log(res);
     billList.value = res;
   }).catch(err => {
-    console.log(err);
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      theme: "error",
+      direction: 'column',
+      message: err.message,
+    });
   }).finally(() => {
   })
 }

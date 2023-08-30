@@ -39,7 +39,7 @@
               reset-type="initial"
               show-error-message
               label-align="left"
-              label-width="110px"
+              label-width="120px"
               @submit="registerConfirm"
               colon
               class="formStyle"
@@ -214,24 +214,24 @@ const onSubmit = ({validateResult}) => {
     loginParams.btnLoading = true;
     if (!checkAuth()) {
       localStorage.removeItem("token");
-      // request.post({
-      //   url: BASE_URL.login,
-      //   data: loginParams.formData
-      // }).then(res => {
-      //   console.log(res)
-      //   localStorage.setItem("token", res.token);
-      //   userInfoToCache(res.userInfo);
-      // }).catch(err => {
-      //   Toast({
-      //     icon: () => h(ErrorCircleIcon),
-      //     theme: "error",
-      //     direction: 'column',
-      //     message: err.message,
-      //   });
-      // }).finally(() => {
-      //   loginParams.btnLoading = false;
-      // });
-      userInfoToCache(userInfo);
+      // userInfoToCache(userInfo);
+      request.post({
+        url: BASE_URL.login,
+        data: loginParams.formData
+      }).then(res => {
+        console.log(res)
+        localStorage.setItem("token", res.token);
+        userInfoToCache(res.userInfo);
+      }).catch(err => {
+        Toast({
+          icon: () => h(ErrorCircleIcon),
+          theme: "error",
+          direction: 'column',
+          message: err.message,
+        });
+      }).finally(() => {
+        loginParams.btnLoading = false;
+      });
     } else {
       loginParams.btnLoading = false;
     }
@@ -262,7 +262,12 @@ const registerConfirm = ({validateResult}) => {
       });
       tabValue.value = "登录";
     }).catch(err => {
-      console.log(err);
+      Toast({
+        icon: () => h(ErrorCircleIcon),
+        theme: "error",
+        direction: 'column',
+        message: err.message,
+      });
     }).finally(() => {
       registerForm.submitBtnLoading = false;
     })
