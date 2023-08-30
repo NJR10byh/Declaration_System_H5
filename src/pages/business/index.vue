@@ -59,13 +59,15 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref} from "vue";
+import {h, onMounted, reactive, ref} from "vue";
 import {useRoute} from "vue-router";
 import router from "@/router";
 import DeclarationCard from "@/pages/business/DeclarationCard.vue";
 import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
 import {statusTextToCode} from "@/utils/goodStatus";
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
+import {Toast} from "tdesign-mobile-vue";
 
 const route = useRoute();
 

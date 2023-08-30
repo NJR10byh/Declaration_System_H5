@@ -30,7 +30,8 @@
         <t-input type="password" v-model="changePasswordFormData.confirmPassword" borderless placeholder="请确认密码"/>
       </t-form-item>
       <div class="button-group">
-        <t-button theme="primary" type="submit" :loading="submitBtnLoading">提交修改</t-button>
+        <t-button theme="primary" type="submit" :loading="submitBtnLoading" :loading-props="{theme: 'dots'}">提交修改
+        </t-button>
       </div>
     </t-form>
   </div>

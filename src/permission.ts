@@ -4,7 +4,7 @@ import {getPermissionStore, getUserStore} from "@/store";
 import router from "@/router";
 import {Toast} from "tdesign-mobile-vue";
 import {isEmpty} from "@/utils/validate";
-import {h} from "vue/dist/vue";
+import {h} from "vue";
 import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 
 NProgress.configure({showSpinner: false});

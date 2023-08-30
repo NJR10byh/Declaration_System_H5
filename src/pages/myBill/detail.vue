@@ -19,37 +19,28 @@
     <t-divider content="账单明细"/>
 
     <BillCard v-for="(item,index) in billDetailInfo.commodityList" :key="index" :billDetailInfo="item"/>
-    <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
+    <t-loading theme="dots" size="40px" style="margin-top: 10px;" :loading="loading" v-show="loading"/>
+    <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;" :loading="!loading" v-show="!loading"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive} from "vue";
+import {onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import BillCard from "@/pages/myBill/BillCard.vue";
 import {timestampToDateTime} from "@/utils/date";
+import {request} from "@/utils/request";
+import {setObjToUrlParams} from "@/utils/request/utils";
+import {BASE_URL} from "@/pages/myBill/constants";
 
 const route = useRoute();
 const router = useRouter();
 
-const billInfo = route.query;
 /**
  * data
  */
-const billDetailInfo = reactive({
-  bankNum: "622184010300710674",
-  payUser: "龙",
-  payTime: 1693030753,
-  settlementSum: 44.0,
-  commodityList: [
-    {
-      orderId: 333,
-      commodityName: "磊哥哥",
-      settlementAmount: 44.0,
-      payUser: "龙"
-    },
-  ]
-});
+const loading = ref(false);
+const billDetailInfo = ref({});
 
 /**
  * methods区
@@ -57,8 +48,17 @@ const billDetailInfo = reactive({
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-  console.log(billInfo);
-
+  loading.value = true;
+  request.get({
+    url: setObjToUrlParams(BASE_URL.billDetailsList, route.query)
+  }).then((res) => {
+    console.log(res)
+    billDetailInfo.value = res[0];
+  }).catch((err) => {
+    console.log(err);
+  }).finally(() => {
+    loading.value = false;
+  })
 });
 
 /**
@@ -66,16 +66,6 @@ onMounted(() => {
  */
 const handleClick = () => {
   window.history.back();
-}
-
-/**
- * 业务相关
- */
-const getDetail = (item) => {
-  router.push({
-    path: `/billDetail`,
-    query: item
-  })
 }
 </script>
 

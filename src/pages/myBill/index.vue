@@ -13,7 +13,8 @@
                 :note="'¥'+item.settlementSum" arrow @click="getDetail(item)"/>
       </t-cell-group>
     </div>
-    <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;"/>
+    <t-loading theme="dots" size="40px" style="margin-top: 10px;" :loading="loading" v-show="loading"/>
+    <t-footer text="-- 没有更多了 --" style="margin: 10px 0 20px 0;" :loading="!loading" v-show="!loading"/>
   </div>
   <t-tab-bar v-model="barValue" :split="false">
     <t-tab-bar-item v-for="item in barList" :key="item.value" :value="item.value" @click="switchTab(item)">
@@ -26,17 +27,21 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {h, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
 import {timestampToDateTime} from "@/utils/date";
+import {Toast} from "tdesign-mobile-vue";
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 
 const router = useRouter();
 
 /**
  * data
  */
+const loading = ref(false);
+
 const barValue = ref('');
 const barList = ref([
   {value: 'home', label: '首页', icon: 'home'},
@@ -72,6 +77,7 @@ const switchTab = (item: any) => {
  */
 const getMyBill = () => {
   billList.value = [];
+  loading.value = true;
   request.get({
     url: BASE_URL.billList
   }).then(res => {
@@ -85,12 +91,13 @@ const getMyBill = () => {
       message: err.message,
     });
   }).finally(() => {
+    loading.value = false;
   })
 }
 const getDetail = (item: any) => {
   router.push({
     path: `/billDetail`,
-    query: item
+    query: {id: item.id}
   })
 }
 </script>

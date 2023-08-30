@@ -63,6 +63,9 @@
             <t-form-item label="银行卡号" name="bankNum">
               <t-input v-model="registerForm.formData.bankNum" borderless placeholder="请输入银行卡号"/>
             </t-form-item>
+            <t-form-item label="支付宝账号" name="zfbNum">
+              <t-input v-model="registerForm.formData.zfbNum" borderless placeholder="请输入支付宝账号"/>
+            </t-form-item>
             <t-form-item label="支付宝收款码" name="zfbPic">
               <t-upload
                   :default-files="registerForm.zfbPic"
@@ -169,9 +172,9 @@ const registerForm = reactive({
     status: '',
     userName: '',
     verifyCode: '',
-    wxPic: '',
     zfbNum: '',
-    zfbPic: ''
+    zfbPic: 'https://img-nos.yiyouliao.com/alph/89ac7afe611b1f23a98e4fa3eea2d5e5.jpeg?yiyouliao_channel=1536235174142947329_image',
+    wxPic: 'https://img-nos.yiyouliao.com/alph/89ac7afe611b1f23a98e4fa3eea2d5e5.jpeg?yiyouliao_channel=1536235174142947329_image'
   },
   formDataRules: {
     bankName: [{required: true, message: "开户行名称必填", trigger: "blur"}],
@@ -181,9 +184,9 @@ const registerForm = reactive({
     phoneNum: [{required: true, message: "手机号必填", trigger: "blur"}],
     userName: [{required: true, message: "姓名必填", trigger: "blur"}],
     verifyCode: [{required: true, message: "邀请码必填", trigger: "blur"}],
-    wxPic: [{required: true, message: "微信收款码必填", trigger: "blur"}],
     zfbNum: [{required: true, message: "支付宝账号必填", trigger: "blur"}],
-    zfbPic: [{required: true, message: "支付宝收款码必填", trigger: "blur"}]
+    zfbPic: [{required: true, message: "支付宝收款码必填", trigger: "blur"}],
+    wxPic: [{required: true, message: "微信收款码必填", trigger: "blur"}]
   },
   zfbPic: [],
   wxPic: [],
@@ -240,7 +243,7 @@ const onSubmit = ({validateResult}) => {
 
 // 注册确认
 const registerConfirm = ({validateResult}) => {
-  if (validateResult) {
+  if (validateResult === true) {
     if (registerForm.formData.confirmPassword !== registerForm.formData.password) {
       Toast({
         theme: "error",
@@ -262,6 +265,7 @@ const registerConfirm = ({validateResult}) => {
       });
       tabValue.value = "登录";
     }).catch(err => {
+      console.log(err)
       Toast({
         icon: () => h(ErrorCircleIcon),
         theme: "error",

@@ -81,12 +81,13 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive} from "vue";
+import {h, onMounted, reactive} from "vue";
 import {timestampToDateTime} from "../../utils/date";
 import {statusCodeToText} from "../../utils/goodStatus";
 import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
-import {Toast} from "tdesign-mobile-vue";
+import {Toast} from "tdesign-mobile-vue"
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 
 const props = defineProps({
   declarationInfo: Object
