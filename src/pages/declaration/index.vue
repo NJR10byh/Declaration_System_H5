@@ -36,8 +36,7 @@
           <t-input v-model="declarationForm.formData.payAmount" borderless placeholder="请输入实付金额"/>
         </t-form-item>
         <t-form-item label="预计返款金额" name="expectPayback">
-          <t-input v-model="declarationForm.formData.expectPayback" borderless placeholder="请输入预计返款金额"
-                   readonly>
+          <t-input v-model="declarationForm.formData.expectPayback" borderless placeholder="请输入预计返款金额">
             <template #suffixIcon>
               <div style="font-size: 15px">元</div>
             </template>
