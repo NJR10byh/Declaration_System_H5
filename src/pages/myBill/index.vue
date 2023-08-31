@@ -86,7 +86,6 @@ const getMyBill = () => {
   }).catch(err => {
     Toast({
       icon: () => h(ErrorCircleIcon),
-      theme: "error",
       direction: 'column',
       message: err.message,
     });

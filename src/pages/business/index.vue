@@ -153,7 +153,6 @@ const getStatusNums = () => {
   }).catch(err => {
     Toast({
       icon: () => h(ErrorCircleIcon),
-      theme: "error",
       direction: 'column',
       message: err.message,
     });
@@ -178,7 +177,6 @@ const getList = () => {
   }).catch(err => {
     Toast({
       icon: () => h(ErrorCircleIcon),
-      theme: "error",
       direction: 'column',
       message: err.message,
     });
@@ -195,7 +193,6 @@ const getCommodityNames = () => {
   }).catch(err => {
     Toast({
       icon: () => h(ErrorCircleIcon),
-      theme: "error",
       direction: 'column',
       message: err.message,
     });
