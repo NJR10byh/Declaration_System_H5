@@ -10,5 +10,6 @@ export const BASE_URL = {
     applyForRefund: "/applyForRefund",
     getStatusNums: "/getStatusNums",
     declaration: "/declaration",
-    uploadImgFile: "/uploadImgFile"
+    uploadImgFile: "/uploadImgFile",
+    getReportDetails: "/getReportDetails"
 };

@@ -106,12 +106,23 @@ const orderPic = ref([]);
  */
 const declarationForm = reactive({
   formData: {
-    commodityId: "",
-    expectPayback: "",
-    notes: "",
-    orderId: "",
+    id: 0,
+    orderId: 0,
+    commodityId: 0,
+    reporterId: 0,
+    trackNum: null,
+    payAmount: 0,
+    actualPayback: 0,
+    status: 0,
+    reportTime: 0,
+    applyPaybackTime: null,
+    examineTime: null,
+    paybackTime: null,
     orderPic: "",
-    payAmount: ""
+    finishPic: "",
+    notes: "",
+    examineNotes: null,
+    payStatId: null
   },
   formDataRules: {
     commodityId: [{required: true, message: "商品id必填", type: "error"}],
@@ -129,8 +140,8 @@ const declarationForm = reactive({
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-  console.log(declarationInfo);
-  Object.assign(declarationForm.formData, declarationInfo);
+  getDeclarationDetails(declarationInfo.id);
+  // Object.assign(declarationForm.formData, declarationInfo);
 });
 
 /**
@@ -195,6 +206,24 @@ const declarationFormSubmit = async ({validateResult}) => {
 /**
  * 业务相关
  */
+// 获取报单详情
+const getDeclarationDetails = (id: any) => {
+  request.get({
+    url: setObjToUrlParams(BASE_URL.getReportDetails, {reportId: id})
+  }).then(res => {
+    console.log(res);
+    Object.assign(declarationForm.formData, res);
+    // orderPic.value.push({
+    //   url: res.orderPic,
+    // })
+  }).catch(err => {
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      direction: 'column',
+      message: err.message,
+    });
+  })
+}
 /**
  * 上传
  */

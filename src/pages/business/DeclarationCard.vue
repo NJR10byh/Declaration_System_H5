@@ -147,7 +147,11 @@ const editOrder = (declarationInfo: any) => {
   console.log(declarationInfo);
   router.push({
     path: "/editDeclaration",
-    query: declarationInfo
+    query: {
+      id: declarationInfo.id,
+      commodity: declarationInfo.commodity,
+      remainAmount: declarationInfo.remainAmount
+    }
   })
 }
 // 申请返款
