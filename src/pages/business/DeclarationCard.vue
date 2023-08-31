@@ -24,18 +24,14 @@
           </div>
         </div>
       </template>
+      <t-divider content="报单明细"/>
       <div class="declarationContent">
         <div class="contentInfo">
-          <div style="width: 100%;">订单号：{{ declarationInfo.orderId }}</div>
-        </div>
-        <div class="contentInfo">
-          <div style="width: 100%;overflow: hidden;">微信名：{{ declarationInfo.userName }}</div>
-        </div>
-
-
-        <div class="contentInfo">
+          <div style="width: 50%;">订单号：{{ declarationInfo.orderId }}</div>
           <div style="width: 50%;">实付金额：{{ declarationInfo.payAmount }} 元</div>
-          <div style="width: 50%;">预计返款金额：{{ declarationInfo.actualPayback }} 元</div>
+        </div>
+        <div class="contentInfo">
+          <div style="width: 100%;">预计返款金额：{{ declarationInfo.actualPayback }} 元</div>
         </div>
         <div class="contentInfo">
           <div style="width: 100%;">报单时间：{{ timestampToDateTime(declarationInfo.reportTime) }}</div>
@@ -59,7 +55,7 @@
           <div style="width: 100%;">审核备注：{{ declarationInfo.examineNotes }}</div>
         </div>
         <div class="contentBtns">
-          <t-button theme="light" size="small" style="margin-right: 5px;" @click="editOrder(declarationInfo)">修改订单
+          <t-button theme="light" size="small" style="margin-right: 5px;" @click="editOrder(declarationInfo)">修改报单
           </t-button>
           <t-button theme="primary" size="small" @click="applyBackMoney(declarationInfo)">申请返款</t-button>
         </div>
@@ -88,6 +84,7 @@ import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
 import {Toast} from "tdesign-mobile-vue"
 import {ErrorCircleIcon} from "tdesign-icons-vue-next";
+import router from "@/router";
 
 const props = defineProps({
   declarationInfo: Object
@@ -148,7 +145,10 @@ onMounted(() => {
 // 修改订单
 const editOrder = (declarationInfo: any) => {
   console.log(declarationInfo);
-
+  router.push({
+    path: "/editDeclaration",
+    query: declarationInfo
+  })
 }
 // 申请返款
 const applyBackMoney = (declarationInfo: any) => {
@@ -235,6 +235,7 @@ const applyForRefund = () => {
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
+    //border-top: 1px solid #aaa;
 
     .contentInfo {
       width: 100%;

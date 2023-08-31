@@ -30,6 +30,12 @@ export default [
         meta: {title: "报单", rolePermission: ["superadmin"]}
     },
     {
+        path: "/editDeclaration",
+        name: "editDeclaration",
+        component: () => import("@/pages/business/editDeclaration.vue"),
+        meta: {title: "修改报单", rolePermission: ["superadmin"]}
+    },
+    {
         path: "/business",
         name: "business",
         component: () => import("@/pages/business/index.vue"),

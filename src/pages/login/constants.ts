@@ -8,4 +8,5 @@ export const BASE_URL = {
     login: "/login",
     updatePassword: "/updatePassword",
     register: "/register",
+    uploadImgFile: "/uploadImgFile"
 };

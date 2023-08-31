@@ -6,13 +6,13 @@
 -->
 <template>
   <t-tabs v-model="tabValue" :space-evenly="false" :sticky="true" @change="changeTab">
-    <t-tab-panel value="今日" :badge-props="{ count: babgeCount.today, offset: [-8, 3] }" label="今日"/>
-    <t-tab-panel value="全部" :badge-props="{ count: babgeCount.all, offset: [-8, 3] }" label="全部"/>
-    <t-tab-panel value="已报单" :badge-props="{ count: babgeCount.declared, offset: [-8, 3] }" label="已报单"/>
-    <t-tab-panel value="待审核" :badge-props="{ count: babgeCount.waitApproval, offset: [-8, 3] }" label="待审核"/>
-    <t-tab-panel value="待返款" :badge-props="{ count: babgeCount.waitBackMoney, offset: [-8, 3] }" label="待返款"/>
-    <t-tab-panel value="已返款" :badge-props="{ count: babgeCount.refunded, offset: [-8, 3] }" label="已返款"/>
-    <t-tab-panel value="已作废" :badge-props="{ count: babgeCount.abolished, offset: [-8, 3] }" label="已作废"/>
+    <t-tab-panel value="今日" :badge-props="{ count: babgeCount.fiveCount, offset: [-8, 3] }" label="今日"/>
+    <t-tab-panel value="全部" :badge-props="{ count: babgeCount.totalCount, offset: [-8, 3] }" label="全部"/>
+    <t-tab-panel value="已报单" :badge-props="{ count: babgeCount.zeroCount, offset: [-8, 3] }" label="已报单"/>
+    <t-tab-panel value="待审核" :badge-props="{ count: babgeCount.oneCount, offset: [-8, 3] }" label="待审核"/>
+    <t-tab-panel value="待返款" :badge-props="{ count: babgeCount.twoCount, offset: [-8, 3] }" label="待返款"/>
+    <t-tab-panel value="已返款" :badge-props="{ count: babgeCount.threeCount, offset: [-8, 3] }" label="已返款"/>
+    <t-tab-panel value="已作废" :badge-props="{ count: babgeCount.fourCount, offset: [-8, 3] }" label="已作废"/>
   </t-tabs>
   <div class="business-container">
     <div class="topSearch">
@@ -84,13 +84,13 @@ const loading = ref(false);
 
 const tabValue = ref(route.query.page);
 const babgeCount = reactive({
-  today: 1,
-  all: 1,
-  declared: 1,
-  waitApproval: 0,
-  waitBackMoney: 1,
-  refunded: 1,
-  abolished: 1
+  totalCount: 0,
+  zeroCount: 0,
+  oneCount: 0,
+  twoCount: 0,
+  threeCount: 0,
+  fourCount: 0,
+  fiveCount: 0
 })
 
 const searchData = reactive({
@@ -115,6 +115,7 @@ const goodsListVisible = ref(false);
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
+  getStatusNums();
   getList();
   getCommodityNames();
 });
@@ -144,6 +145,20 @@ const goodsNameClear = () => {
 /**
  * 业务相关
  */
+const getStatusNums = () => {
+  request.get({
+    url: BASE_URL.getStatusNums
+  }).then(res => {
+    Object.assign(babgeCount, res);
+  }).catch(err => {
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      theme: "error",
+      direction: 'column',
+      message: err.message,
+    });
+  })
+}
 const getList = () => {
   declarationList.value = [];
   searchData.status = statusTextToCode(tabValue.value.toString())

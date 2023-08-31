@@ -7,4 +7,5 @@
 export const BASE_URL = {
     logout: "/logout",
     editPersonalInfo: "/editPersonalInfo",
+    uploadImgFile: "/uploadImgFile"
 }

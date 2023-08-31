@@ -68,26 +68,38 @@
             </t-form-item>
             <t-form-item label="支付宝收款码" name="zfbPic">
               <t-upload
-                  :default-files="registerForm.zfbPic"
-                  v-model:value="registerForm.zfbPic"
+                  ref="uploadZfbPic"
+                  :default-files="zfbPic"
+                  v-model="zfbPic"
+                  :abridge-name="[10,8]"
+                  :auto-upload="false"
                   :multiple="false"
                   :max="1"
-                  :size-limit="{ size: 3000000, unit: 'B' }"
+                  theme="image"
                   accept="image/*"
-                  action="//service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
-                  @validate="onValidate"
+                  :before-upload="beforeUpload"
+                  :request-method="uploadALiPayCode"
+                  :size-limit="{ size: 10, unit: 'MB' }"
+                  @validate="validateFile"
+                  @fail="uploadFail"
               />
             </t-form-item>
             <t-form-item label="微信收款码" name="wxPic">
               <t-upload
-                  :default-files="registerForm.wxPic"
-                  v-model:value="registerForm.wxPic"
+                  ref="uploadWxPic"
+                  :default-files="wxPic"
+                  v-model="wxPic"
+                  :abridge-name="[10,8]"
+                  :auto-upload="false"
                   :multiple="false"
                   :max="1"
-                  :size-limit="{ size: 3000000, unit: 'B' }"
+                  theme="image"
                   accept="image/*"
-                  action="//service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
-                  @validate="onValidate"
+                  :before-upload="beforeUpload"
+                  :request-method="uploadWeChatCode"
+                  :size-limit="{ size: 10, unit: 'MB' }"
+                  @validate="validateFile"
+                  @fail="uploadFail"
               />
             </t-form-item>
             <t-form-item label="邀请码" name="wxPic">
@@ -121,6 +133,8 @@ import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 import {isNotEmpty, validateMobilePhone} from "@/utils/validate";
 import {rule} from "postcss";
 import windingLine from "zrender/lib/contain/windingLine";
+import {uploadFile, validateFile, validateFileType} from "@/utils/files";
+import {setObjToUrlParams} from "@/utils/request/utils";
 
 const tabValue = ref('登录');
 const tabList = [
@@ -149,6 +163,11 @@ const loginParams = reactive({
     ]
   }
 })
+
+const uploadZfbPic = ref();
+const uploadWxPic = ref();
+const zfbPic = ref([]);
+const wxPic = ref([]);
 
 const registerForm = reactive({
   visible: false,
@@ -207,11 +226,14 @@ const tabChange = (value: any) => {
   tabValue.value = value;
 }
 
-const onValidate = (context: { type: string; }) => {
-  if (context.type === 'FILE_OVER_SIZE_LIMIT') {
-    Message.warning('文件大小超出上限');
-  }
-}
+// 上传文件失败钩子
+const uploadFail = ({file}) => {
+  Toast({
+    icon: () => h(ErrorCircleIcon),
+    direction: 'column',
+    message: `文件 ${file.name} 上传失败`,
+  })
+};
 const onSubmit = ({validateResult}) => {
   if (validateResult === true) {
     loginParams.btnLoading = true;
@@ -228,7 +250,6 @@ const onSubmit = ({validateResult}) => {
       }).catch(err => {
         Toast({
           icon: () => h(ErrorCircleIcon),
-          theme: "error",
           direction: 'column',
           message: err.message,
         });
@@ -241,41 +262,113 @@ const onSubmit = ({validateResult}) => {
   }
 };
 
-// 注册确认
-const registerConfirm = ({validateResult}) => {
-  if (validateResult === true) {
-    if (registerForm.formData.confirmPassword !== registerForm.formData.password) {
-      Toast({
-        theme: "error",
-        direction: 'column',
-        message: "两次密码不一致",
-      });
-      return;
-    }
-    registerForm.submitBtnLoading = true;
-    request.post({
-      url: BASE_URL.register,
-      data: registerForm.formData
-    }).then(res => {
-      console.log(res);
-      Toast({
-        theme: "success",
-        direction: 'column',
-        message: "注册成功",
-      });
-      tabValue.value = "登录";
-    }).catch(err => {
-      console.log(err)
-      Toast({
-        icon: () => h(ErrorCircleIcon),
-        theme: "error",
-        direction: 'column',
-        message: err.message,
-      });
-    }).finally(() => {
-      registerForm.submitBtnLoading = false;
+/**
+ * 上传
+ */
+const beforeUpload = (file: { type: string; }) => {
+  return validateFileType("image/*", file.type);
+};
+
+
+// 上传收款码-支付宝
+const uploadALiPayCode = (file: any) => {
+  console.log(zfbPic.value)
+  if (isNotEmpty(file.raw)) {
+    return new Promise((resolve, reject) => {
+      let params = {
+        phoneNum: registerForm.formData.phoneNum,
+        userName: registerForm.formData.userName,
+        fileFlag: 2
+      }
+      let fileFormData = new FormData();
+      fileFormData.append("file", file.raw);
+      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+      uploadFile(requestUrl, fileFormData, percentCompleted => {
+        zfbPic.value[0].percent = percentCompleted;
+        if (percentCompleted === 100) {
+          zfbPic.value[0].status = "success";
+        }
+      }).then(res => {
+        Object.assign(registerForm.formData, {
+          zfbPic: String(res)
+        });
+        resolve(res);
+      }).catch(err => {
+        console.error(err);
+        reject(err);
+      }).finally(() => {
+      })
     })
   }
+}
+// 上传收款码-微信
+const uploadWeChatCode = (file: any) => {
+  if (isNotEmpty(file.raw)) {
+    return new Promise((resolve, reject) => {
+      let params = {
+        phoneNum: registerForm.formData.phoneNum,
+        userName: registerForm.formData.userName,
+        fileFlag: 3
+      }
+      let fileFormData = new FormData();
+      fileFormData.append("file", file.raw);
+      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+      uploadFile(requestUrl, fileFormData, percentCompleted => {
+        wxPic.value[0].percent = percentCompleted;
+        if (percentCompleted === 100) {
+          wxPic.value[0].status = "success";
+        }
+      }).then(res => {
+        Object.assign(registerForm.formData, {
+          wxPic: String(res)
+        });
+        resolve(res);
+      }).catch(err => {
+        console.error(err);
+        reject(err);
+      }).finally(() => {
+      })
+    })
+  }
+}
+
+// 注册确认
+const registerConfirm = async ({validateResult}) => {
+  await Promise.all([uploadZfbPic.value.uploadFiles(), uploadWxPic.value.uploadFiles()]);
+  setTimeout(() => {
+    if (validateResult === true) {
+      if (registerForm.formData.confirmPassword !== registerForm.formData.password) {
+        Toast({
+          theme: "error",
+          direction: 'column',
+          message: "两次密码不一致",
+        });
+        return;
+      }
+      registerForm.submitBtnLoading = true;
+      request.post({
+        url: BASE_URL.register,
+        data: registerForm.formData
+      }).then(res => {
+        console.log(res);
+        Toast({
+          theme: "success",
+          direction: 'column',
+          message: "注册成功",
+        });
+        tabValue.value = "登录";
+      }).catch(err => {
+        console.log(err)
+        Toast({
+          icon: () => h(ErrorCircleIcon),
+          direction: 'column',
+          message: err.message,
+        });
+      }).finally(() => {
+        registerForm.submitBtnLoading = false;
+      })
+    }
+  }, 800)
 }
 </script>
 

@@ -34,26 +34,38 @@
       </t-form-item>
       <t-form-item label="支付宝收款码" name="zfbPic">
         <t-upload
+            ref="uploadZfbPic"
             :default-files="zfbPic"
-            v-model:value="zfbPic"
+            v-model="zfbPic"
+            :abridge-name="[10,8]"
+            :auto-upload="false"
             :multiple="false"
             :max="1"
-            :size-limit="{ size: 3000000, unit: 'B' }"
+            theme="image"
             accept="image/*"
-            action="//service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
-            @validate="onValidate"
+            :before-upload="beforeUpload"
+            :request-method="uploadALiPayCode"
+            :size-limit="{ size: 10, unit: 'MB' }"
+            @validate="validateFile"
+            @fail="uploadFail"
         />
       </t-form-item>
       <t-form-item label="微信收款码" name="wxPic">
         <t-upload
+            ref="uploadWxPic"
             :default-files="wxPic"
-            v-model:value="wxPic"
+            v-model="wxPic"
+            :abridge-name="[10,8]"
+            :auto-upload="false"
             :multiple="false"
             :max="1"
-            :size-limit="{ size: 3000000, unit: 'B' }"
+            theme="image"
             accept="image/*"
-            action="//service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
-            @validate="onValidate"
+            :before-upload="beforeUpload"
+            :request-method="uploadWeChatCode"
+            :size-limit="{ size: 10, unit: 'MB' }"
+            @validate="validateFile"
+            @fail="uploadFail"
         />
       </t-form-item>
       <div class="button-group">
@@ -65,11 +77,15 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref} from "vue";
-import {Message, Toast} from "tdesign-mobile-vue";
+import {h, onMounted, reactive, ref} from "vue";
+import {Toast} from "tdesign-mobile-vue";
 import {useUserStore} from "@/store";
-import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
+import {uploadFile, validateFile, validateFileType} from "@/utils/files";
+import {isNotEmpty} from "@/utils/validate";
+import {setObjToUrlParams} from "@/utils/request/utils";
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
+import {request} from "@/utils/request";
 import router from "@/router";
 
 const userStore = useUserStore();
@@ -92,6 +108,8 @@ const userInfoFormData = reactive({
 })
 const userInfoFormDataRules = reactive([])
 
+const uploadZfbPic = ref();
+const uploadWxPic = ref();
 const zfbPic = ref([]);
 const wxPic = ref([]);
 
@@ -107,8 +125,8 @@ onMounted(() => {
     userName: userInfo.userName,
     bankName: userInfo.bankName,
     bankNum: userInfo.bankNum,
-    zfbPic: "https://img-s-msn-com.akamaized.net/tenant/amp/entityid/AA1fULU9.img?w=768&h=507&m=6&x=433&y=125&s=78&d=78",
-    wxPic: "https://lqimg.dftoutiao.com/news/20230828/20230828114116_f4db414c5c94da55ca3759177d308345_2.png",
+    zfbPic: "",
+    wxPic: "",
   });
 });
 
@@ -120,30 +138,120 @@ const handleClick = () => {
 }
 const onValidate = (context: { type: string; }) => {
   if (context.type === 'FILE_OVER_SIZE_LIMIT') {
-    Message.warning('文件大小超出上限');
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      direction: 'column',
+      message: '文件大小超出上限',
+    })
   }
 }
-const onSubmit = () => {
+// 上传文件失败钩子
+const uploadFail = ({file}) => {
+  Toast({
+    icon: () => h(ErrorCircleIcon),
+    direction: 'column',
+    message: `文件 ${file.name} 上传失败`,
+  })
+};
+// 提交
+const onSubmit = async () => {
+  await Promise.all([uploadZfbPic.value.uploadFiles(), uploadWxPic.value.uploadFiles()]);
   console.log(userInfoFormData)
   submitBtnLoading.value = true;
-  request.post({
-    url: BASE_URL.editPersonalInfo,
-    data: userInfoFormData
-  }).then(res => {
-    if (res) {
-      Toast.success("修改成功");
-    }
-  }).catch(err => {
-    Toast.error(err.message);
-  }).finally(() => {
-    submitBtnLoading.value = false;
-    router.push("/user")
-  });
+  setTimeout(() => {
+    request.post({
+      url: BASE_URL.editPersonalInfo,
+      data: userInfoFormData
+    }).then(res => {
+      if (res) {
+        Toast.success("修改成功");
+        userStore.getUserInfo(res);
+        router.push("/user")
+      }
+    }).catch(err => {
+      Toast({
+        icon: () => h(ErrorCircleIcon),
+        direction: 'column',
+        message: err.message,
+      });
+    }).finally(() => {
+      submitBtnLoading.value = false;
+    });
+  }, 800)
 }
 
 /**
  * 业务相关
  */
+/**
+ * 上传
+ */
+const beforeUpload = (file: { type: string; }) => {
+  return validateFileType("image/*", file.type);
+};
+
+
+// 上传收款码-支付宝
+const uploadALiPayCode = (file: any) => {
+  console.log(zfbPic.value)
+  if (isNotEmpty(file.raw)) {
+    return new Promise((resolve, reject) => {
+      let params = {
+        phoneNum: userInfo.phoneNum,
+        userName: userInfo.userName,
+        fileFlag: 2
+      }
+      let fileFormData = new FormData();
+      fileFormData.append("file", file.raw);
+      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+      uploadFile(requestUrl, fileFormData, percentCompleted => {
+        zfbPic.value[0].percent = percentCompleted;
+        if (percentCompleted === 100) {
+          zfbPic.value[0].status = "success";
+        }
+      }).then(res => {
+        Object.assign(userInfoFormData, {
+          zfbPic: String(res)
+        });
+        resolve(res);
+      }).catch(err => {
+        console.error(err);
+        reject(err);
+      }).finally(() => {
+      })
+    })
+  }
+}
+// 上传收款码-微信
+const uploadWeChatCode = (file: any) => {
+  if (isNotEmpty(file.raw)) {
+    return new Promise((resolve, reject) => {
+      let params = {
+        phoneNum: userInfo.phoneNum,
+        userName: userInfo.userName,
+        fileFlag: 3
+      }
+      let fileFormData = new FormData();
+      fileFormData.append("file", file.raw);
+      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+      uploadFile(requestUrl, fileFormData, percentCompleted => {
+        wxPic.value[0].percent = percentCompleted;
+        if (percentCompleted === 100) {
+          wxPic.value[0].status = "success";
+        }
+      }).then(res => {
+        Object.assign(userInfoFormData, {
+          wxPic: String(res)
+        });
+        resolve(res);
+      }).catch(err => {
+        console.error(err);
+        reject(err);
+      }).finally(() => {
+      })
+    })
+  }
+}
 </script>
 
 <style lang="less" scoped>

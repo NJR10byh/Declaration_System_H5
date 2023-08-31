@@ -1,16 +1,16 @@
 <!--
   * @author baoyuhao
-  * @date 2023/8/9 10:31:37
-  * @description 报单
+  * @date 2023/8/31 15:47:42
+  * @description 修改报单
   * @version 0.8.0
 -->
 <template>
-  <t-navbar title="报单" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
+  <t-navbar title="修改报单" fixed left-arrow style="z-index: 2000" @left-click="handleClick"/>
   <div class="declaration-container">
     <div class="cellGroup">
       <t-cell-group theme="card">
-        <t-cell title="商品名称" :note="goodsInfo.commodity"/>
-        <t-cell title="剩余额度" :note="goodsInfo.remainAmount"/>
+        <t-cell title="商品名称" :note="declarationInfo.commodity"/>
+        <t-cell title="剩余额度" :note="declarationInfo.remainAmount"/>
       </t-cell-group>
     </div>
 
@@ -70,8 +70,7 @@
             </div>
           </div>
         </t-form-item>
-        <div class="button-group">
-          <t-button theme="primary" variant="outline" @click="to_home">首页</t-button>
+        <div class="btn">
           <t-button theme="primary" type="submit" :loading="declarationForm.submitBtnLoading"
                     :loading-props="{theme: 'dots'}">提交
           </t-button>
@@ -98,7 +97,7 @@ const router = useRouter();
 /**
  * data
  */
-const goodsInfo = route.query;
+const declarationInfo = route.query;
 
 const uploadOrderPic = ref();
 const orderPic = ref([]);
@@ -107,7 +106,7 @@ const orderPic = ref([]);
  */
 const declarationForm = reactive({
   formData: {
-    commodityId: goodsInfo.id,
+    commodityId: "",
     expectPayback: "",
     notes: "",
     orderId: "",
@@ -130,7 +129,8 @@ const declarationForm = reactive({
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-  console.log(goodsInfo);
+  console.log(declarationInfo);
+  Object.assign(declarationForm.formData, declarationInfo);
 });
 
 /**
@@ -262,13 +262,11 @@ const to_home = () => {
     border-radius: 10px;
     margin-top: 10px;
 
-    .button-group {
+    .btn {
       padding: 10px;
-      display: flex;
-      justify-content: space-between;
 
       .t-button {
-        width: 47%;
+        width: 100%;
       }
     }
   }

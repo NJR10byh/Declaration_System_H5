@@ -75,9 +75,10 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref} from "vue";
-import {Message} from "tdesign-mobile-vue";
+import {h, onMounted, reactive, ref} from "vue";
+import {Toast} from "tdesign-mobile-vue";
 import {useRoute, useRouter} from "vue-router";
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 
 const route = useRoute();
 const router = useRouter();
@@ -122,7 +123,11 @@ const handleClick = () => {
 }
 const onValidate = (context: any) => {
   if (context.type === 'FILE_OVER_SIZE_LIMIT') {
-    Message.warning('文件大小超出上限');
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      direction: 'column',
+      message: '文件大小超出上限',
+    })
   }
 };
 

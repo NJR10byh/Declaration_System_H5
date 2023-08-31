@@ -45,12 +45,14 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {h, onMounted, ref} from "vue";
 import GoodsCard from "@/pages/home/GoodsCard.vue";
 import router from "@/router";
 import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
 import {setObjToUrlParams} from "@/utils/request/utils";
+import {ErrorCircleIcon} from "tdesign-icons-vue-next";
+import {Toast} from "tdesign-mobile-vue";
 
 /**
  * data
