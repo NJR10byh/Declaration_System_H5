@@ -208,6 +208,7 @@ const uploadPic_order = (file: any) => {
   if (isNotEmpty(file.raw)) {
     return new Promise((resolve, reject) => {
       let params = {
+        orderId: declarationForm.formData.orderId,
         fileFlag: 0
       }
       let fileFormData = new FormData();

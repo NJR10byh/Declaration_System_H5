@@ -61,7 +61,6 @@ router.beforeEach(async (to, from, next) => {
         } catch (error) {
             Toast({
                 icon: () => h(ErrorCircleIcon),
-                theme: "error",
                 direction: 'column',
                 message: error,
             });

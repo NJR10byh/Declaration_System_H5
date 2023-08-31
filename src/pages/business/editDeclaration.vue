@@ -216,6 +216,13 @@ const getDeclarationDetails = (id: any) => {
     // orderPic.value.push({
     //   url: res.orderPic,
     // })
+    if (res.orderPic.indexOf("http") !== -1) {
+      orderPic.value = [{
+        url: res.orderPic,
+        name: 'orderPic.png',
+        type: 'image',
+      }]
+    }
   }).catch(err => {
     Toast({
       icon: () => h(ErrorCircleIcon),

@@ -239,7 +239,6 @@ const onSubmit = ({validateResult}) => {
     loginParams.btnLoading = true;
     if (!checkAuth()) {
       localStorage.removeItem("token");
-      // userInfoToCache(userInfo);
       request.post({
         url: BASE_URL.login,
         data: loginParams.formData
