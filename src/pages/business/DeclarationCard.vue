@@ -62,28 +62,12 @@
       </div>
     </t-collapse-panel>
   </t-collapse>
-
-  <t-dialog
-      v-model:visible="applyForRefundDialog.visible"
-      close-on-overlay-click
-      title="物流单号"
-      :cancel-btn="applyForRefundDialog.cancelBtn"
-      :confirm-btn="applyForRefundDialog.confirmBtn"
-      @confirm="applyForRefund"
-      class="applyForRefundDialogStyle"
-  >
-    <t-input placeholder="请填写物流单号" v-model="applyForRefundFormData.trackNum"/>
-  </t-dialog>
 </template>
 
 <script setup lang="ts">
-import {h, onMounted, reactive} from "vue";
+import {onMounted, reactive} from "vue";
 import {timestampToDateTime} from "../../utils/date";
 import {statusCodeToText} from "../../utils/goodStatus";
-import {request} from "@/utils/request";
-import {BASE_URL} from "./constants";
-import {Toast} from "tdesign-mobile-vue"
-import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 import router from "@/router";
 
 const props = defineProps({
@@ -111,19 +95,6 @@ const applyForRefundFormData = reactive({
   reporterId: "",
   status: "",
   trackNum: ""
-})
-const applyForRefundDialog = reactive({
-  visible: false,
-  confirmBtn: {
-    content: '确认',
-    variant: 'text',
-    size: 'large',
-  },
-  cancelBtn: {
-    content: '取消',
-    variant: 'text',
-    size: 'large',
-  },
 })
 
 /**
@@ -156,38 +127,12 @@ const editOrder = (declarationInfo: any) => {
 }
 // 申请返款
 const applyBackMoney = (declarationInfo: any) => {
-  console.log(declarationInfo);
-  applyForRefundDialog.visible = true;
-}
-// 申请返款确认
-const applyForRefund = () => {
-  console.log(applyForRefundFormData)
-  if (!applyForRefundFormData.trackNum) {
-    Toast({
-      theme: "error",
-      direction: 'column',
-      message: "请填写物流单号",
-    });
-    return;
-  }
-  request.post({
-    url: BASE_URL.applyForRefund,
-    data: applyForRefundFormData
-  }).then(res => {
-    console.log(res);
-    Toast({
-      theme: "success",
-      direction: 'column',
-      message: "申请返款成功",
-    });
-  }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
-  }).finally(() => {
-    applyForRefundDialog.visible = false;
+  router.push({
+    path: "/applyBackMoney",
+    query: {
+      id: declarationInfo.id,
+      commodity: declarationInfo.commodity,
+    }
   })
 }
 </script>

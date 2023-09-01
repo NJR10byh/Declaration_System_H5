@@ -213,9 +213,6 @@ const getDeclarationDetails = (id: any) => {
   }).then(res => {
     console.log(res);
     Object.assign(declarationForm.formData, res);
-    // orderPic.value.push({
-    //   url: res.orderPic,
-    // })
     if (res.orderPic.indexOf("http") !== -1) {
       orderPic.value = [{
         url: res.orderPic,

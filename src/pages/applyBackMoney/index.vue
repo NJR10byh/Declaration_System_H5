@@ -13,27 +13,28 @@
           注意：订单确认收货完成满七天后填写，不到时间不要上传！
         </span>
       </t-cell>
-      <t-cell title="商品名称" :note="declarationInfo.goodsName"/>
+      <t-cell title="商品名称" :note="route.query.commodity"/>
       <t-cell title="实付金额">
         <template #note>
-          <span>{{ declarationInfo.relMoney }}</span>元
+          <span>{{ applyForRefundFormData.actualPayback }}</span>元
         </template>
       </t-cell>
       <t-cell title="物流单号">
         <template #note>
-          <span>{{ declarationInfo.preBackMoney }}</span>
+          <t-input v-model="applyForRefundFormData.trackNum" borderless align="right" placeholder="请填写物流单号"
+                   clearable/>
         </template>
       </t-cell>
       <t-cell title="预计返款金额">
         <template #note>
-          <span>{{ declarationInfo.preBackMoney }}</span>元
+          <span>{{ applyForRefundFormData.examineTime }}</span>元
         </template>
       </t-cell>
     </t-cell-group>
 
     <t-form
         ref="form"
-        :data="declarationFormData"
+        :data="applyForRefundFormData"
         :rules="declarationRules"
         reset-type="initial"
         labelWidth="110px"
@@ -44,17 +45,26 @@
     >
       <t-form-item label="订单完成图" style="display: flex;flex-direction: column">
         <t-upload
-            v-model="declarationFormData.orderPic"
+            ref="uploadFinish"
+            :default-files="finishPic"
+            v-model="finishPic"
+            :abridge-name="[10,8]"
+            :auto-upload="false"
             :multiple="false"
             :max="1"
-            :size-limit="{ size: 3000000, unit: 'B' }"
+            theme="image"
             accept="image/*"
-            action="//service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
-            @validate="onValidate"
+            :before-upload="beforeUpload"
+            :request-method="uploadFinishPic"
+            :size-limit="{ size: 10, unit: 'MB' }"
+            @validate="validateFile"
+            @fail="uploadFail"
         />
       </t-form-item>
       <div class="button-group">
-        <t-button theme="primary" type="submit">提交</t-button>
+        <t-button theme="primary" type="submit" :loading="submitBtnLoading"
+                  :loading-props="{theme: 'dots'}">提交
+        </t-button>
       </div>
     </t-form>
 
@@ -79,31 +89,52 @@ import {h, onMounted, reactive, ref} from "vue";
 import {Toast} from "tdesign-mobile-vue";
 import {useRoute, useRouter} from "vue-router";
 import {ErrorCircleIcon} from "tdesign-icons-vue-next";
+import {BASE_URL} from "./constants";
+import {request} from "@/utils/request";
+import {setObjToUrlParams} from "@/utils/request/utils";
+import {uploadFile, validateFile, validateFileType} from "@/utils/files";
+import {isEmpty, isNotEmpty} from "@/utils/validate";
 
 const route = useRoute();
 const router = useRouter();
 
-const declarationInfo = route.query;
+const declarationId = route.query.id;
 /**
  * data
  */
+const uploadFinish = ref();
+const finishPic = ref([]);
+
 // 报单表单数据
-const declarationFormData = reactive({
-  wechatName: "",
+const applyForRefundFormData = reactive({
+  actualPayback: "",
+  applyPaybackTime: "",
+  commodityId: "",
+  examineNotes: "",
+  examineTime: "",
+  finishPic: "",
+  notes: "",
   orderId: "",
-  relMoney: "",
-  preBackMoney: 0,
-  remark: "",
   orderPic: "",
+  payAmount: "",
+  payStatId: "",
+  paybackTime: "",
+  reportTime: "",
+  reporterId: "",
+  status: "",
+  trackNum: ""
 })
 
 // 报单表单校验
 const declarationRules = reactive([])
 
+// 提交按钮loading
+const submitBtnLoading = ref(false);
+
 // 示例图片
 const examplePicVisible = ref(false);
 const examplePic = reactive([
-  'http://182.43.37.55:6002/static/img/tip.jpeg'
+  'http://47.113.188.245:8900/userReport/file/tip.jpeg'
 ]);
 /**
  * methods区
@@ -111,8 +142,7 @@ const examplePic = reactive([
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-  console.log(declarationInfo);
-
+  getDeclarationDetails(declarationId);
 });
 
 /**
@@ -121,25 +151,117 @@ onMounted(() => {
 const handleClick = () => {
   window.history.back();
 }
-const onValidate = (context: any) => {
-  if (context.type === 'FILE_OVER_SIZE_LIMIT') {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: '文件大小超出上限',
-    })
-  }
+// 上传文件失败钩子
+const uploadFail = ({file}) => {
+  Toast({
+    icon: () => h(ErrorCircleIcon),
+    direction: 'column',
+    message: `文件 ${file.name} 上传失败`,
+  })
 };
-
-const declarationFormSubmit = () => {
-  console.log(declarationFormData)
-}
 
 /**
  * 业务相关
  */
-const to_home = () => {
-  router.push("/home");
+// 获取报单详情
+const getDeclarationDetails = (id: any) => {
+  request.get({
+    url: setObjToUrlParams(BASE_URL.getReportDetails, {reportId: id})
+  }).then(res => {
+    console.log(res);
+    Object.assign(applyForRefundFormData, res);
+    if (isNotEmpty(res.finishPic) && res.finishPic.indexOf("http") !== -1) {
+      finishPic.value = [{
+        url: res.finishPic,
+        name: 'finishPic.png',
+        type: 'image',
+      }]
+    }
+  }).catch(err => {
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      direction: 'column',
+      message: err.message,
+    });
+  })
+}
+
+/**
+ * 上传
+ */
+const beforeUpload = (file: { type: string; }) => {
+  return validateFileType("image/*", file.type);
+};
+// 上传订单完成图
+const uploadFinishPic = (file: any) => {
+  if (isNotEmpty(file.raw)) {
+    let params = {
+      orderId: applyForRefundFormData.orderId,
+      fileFlag: 1
+    }
+    let fileFormData = new FormData();
+    fileFormData.append("file", file.raw);
+    let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+    uploadFile(requestUrl, fileFormData, percentCompleted => {
+      finishPic.value[0].percent = percentCompleted;
+      if (percentCompleted === 100) {
+        finishPic.value[0].status = "success";
+      }
+    }).then(res => {
+      Object.assign(applyForRefundFormData, {
+        finishPic: String(res)
+      });
+    }).catch(err => {
+      console.error(err);
+    }).finally(() => {
+    })
+  }
+}
+// 申请返款确认
+const declarationFormSubmit = async () => {
+  submitBtnLoading.value = true;
+  if (isEmpty(applyForRefundFormData.trackNum)) {
+    Toast({
+      theme: "error",
+      direction: 'column',
+      message: "请填写物流单号",
+    });
+    submitBtnLoading.value = false;
+    return;
+  }
+  uploadFinish.value.uploadFiles();
+  setTimeout(() => {
+    console.log(applyForRefundFormData.finishPic);
+    if (isEmpty(applyForRefundFormData.finishPic)) {
+      Toast({
+        theme: "error",
+        direction: 'column',
+        message: "请上传订单完成图",
+      });
+      submitBtnLoading.value = false;
+      return;
+    }
+    request.post({
+      url: BASE_URL.applyForRefund,
+      data: applyForRefundFormData
+    }).then(res => {
+      console.log(res);
+      Toast({
+        theme: "success",
+        direction: 'column',
+        message: "申请返款成功",
+      });
+      window.history.back();
+    }).catch(err => {
+      Toast({
+        icon: () => h(ErrorCircleIcon),
+        direction: 'column',
+        message: err.message,
+      });
+    }).finally(() => {
+      submitBtnLoading.value = false;
+    })
+  }, 1500)
 }
 </script>
 
@@ -155,7 +277,7 @@ const to_home = () => {
   padding-bottom: 20px;
 
   .cellGroup {
-    width: 90%;
+    width: 100%;
     margin-top: 58px;
 
     .t-input {
@@ -179,7 +301,7 @@ const to_home = () => {
   }
 
   .Tips {
-    width: 90%;
+    width: 100%;
     margin-top: 10px;
 
     .example {

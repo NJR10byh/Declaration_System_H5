@@ -37,7 +37,8 @@
           </t-input>
         </t-form-item>
         <t-form-item label="预计返款金额" name="expectPayback">
-          <t-input v-model="declarationForm.formData.expectPayback" borderless placeholder="请输入预计返款金额">
+          <t-input v-model="goodsInfo.expectPayback" borderless placeholder="请输入预计返款金额" readonly
+                   disabled>
             <template #suffixIcon>
               <div style="font-size: 15px">元</div>
             </template>
@@ -108,7 +109,7 @@ const orderPic = ref([]);
 const declarationForm = reactive({
   formData: {
     commodityId: goodsInfo.id,
-    expectPayback: "",
+    expectPayback: goodsInfo.expectPayback,
     notes: "",
     orderId: "",
     orderPic: "",
@@ -116,7 +117,6 @@ const declarationForm = reactive({
   },
   formDataRules: {
     commodityId: [{required: true, message: "商品id必填", type: "error"}],
-    expectPayback: [{required: true, message: "预计返款金额必填", type: "error"}],
     notes: [{required: true, message: "备注必填", type: "error"}],
     orderId: [{required: true, message: "订单号必填", type: "error"}],
     payAmount: [{required: true, message: "实付金额必填", type: "error"}]

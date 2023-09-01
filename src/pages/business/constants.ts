@@ -7,7 +7,6 @@
 export const BASE_URL = {
     showList: "/showList",
     getCommodityNames: "/getCommodityNames",
-    applyForRefund: "/applyForRefund",
     getStatusNums: "/getStatusNums",
     declaration: "/declaration",
     uploadImgFile: "/uploadImgFile",
