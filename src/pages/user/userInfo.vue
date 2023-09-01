@@ -83,10 +83,10 @@ import {useUserStore} from "@/store";
 import {BASE_URL} from "./constants";
 import {uploadFile, validateFile, validateFileType} from "@/utils/files";
 import {isNotEmpty} from "@/utils/validate";
-import {setObjToUrlParams} from "@/utils/request/utils";
 import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 import {request} from "@/utils/request";
 import router from "@/router";
+import {setObjToUrlParams} from "@/utils/request/utils";
 
 const userStore = useUserStore();
 const {userInfo} = userStore;
@@ -125,9 +125,17 @@ onMounted(() => {
     userName: userInfo.userName,
     bankName: userInfo.bankName,
     bankNum: userInfo.bankNum,
-    zfbPic: "",
-    wxPic: "",
+    zfbPic: userInfo.zfbPic,
+    wxPic: userInfo.wxPic,
   });
+  zfbPic.value = [{
+    url: userInfo.zfbPic,
+    name: userInfo.zfbPic
+  }];
+  wxPic.value = [{
+    url: userInfo.wxPic,
+    name: userInfo.wxPic
+  }];
 });
 
 /**
@@ -135,15 +143,6 @@ onMounted(() => {
  */
 const handleClick = () => {
   window.history.back();
-}
-const onValidate = (context: { type: string; }) => {
-  if (context.type === 'FILE_OVER_SIZE_LIMIT') {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: '文件大小超出上限',
-    })
-  }
 }
 // 上传文件失败钩子
 const uploadFail = ({file}) => {
@@ -193,7 +192,6 @@ const beforeUpload = (file: { type: string; }) => {
 
 // 上传收款码-支付宝
 const uploadALiPayCode = (file: any) => {
-  console.log(zfbPic.value)
   if (isNotEmpty(file.raw)) {
     return new Promise((resolve, reject) => {
       let params = {

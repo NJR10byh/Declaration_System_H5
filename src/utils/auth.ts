@@ -19,6 +19,8 @@ const userInfo = reactive({
     phoneNum: "",
     userName: "",
     zfbNum: "",
+    zfbPic: "",
+    wxPic: "",
     role: ""
 });
 
@@ -40,13 +42,7 @@ export const checkAuth = () => {
  * @param info
  */
 export const userInfoToCache = async (info: any) => {
-    userInfo.bankName = info.bankName;
-    userInfo.bankNum = info.bankNum;
-    userInfo.id = info.id;
-    userInfo.phoneNum = info.phoneNum;
-    userInfo.userName = info.userName;
-    userInfo.zfbNum = info.zfbNum;
-    userInfo.role = info.role;
+    Object.assign(userInfo, info);
     userStore.getUserInfo(userInfo);
     await permissionStore.initRoutes(info.role);
 

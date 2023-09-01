@@ -8,6 +8,8 @@ const userInfo = {
     phoneNum: "",
     userName: "",
     zfbNum: "",
+    zfbPic: "",
+    wxPic: "",
     role: ""
 };
 
@@ -32,6 +34,8 @@ export const useUserStore = defineStore("user", {
                 phoneNum: "",
                 userName: "",
                 zfbNum: "",
+                zfbPic: "",
+                wxPic: "",
                 role: ""
             };
         }
