@@ -161,7 +161,7 @@ const handleLogout = async () => {
     width: 100%;
     margin-top: 70px;
 
-    .t-grid-item /deep/ .t-grid-item__image {
+    .t-grid-item :deep(.t-grid-item__image) {
       background: #fff;
     }
   }
