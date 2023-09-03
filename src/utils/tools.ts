@@ -15,8 +15,7 @@ import {Toast} from "tdesign-mobile-vue";
  */
 export const copyInfo = (info: string) => {
     if (isNotEmpty(info)) {
-        copy(info);
-        Toast.success("已复制")
+        copy(info) ? Toast.success("已复制") : Toast.error("复制失败");
     } else {
         Toast.error("复制值为空")
     }
