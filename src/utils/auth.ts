@@ -45,12 +45,7 @@ export const userInfoToCache = async (info: any) => {
     Object.assign(userInfo, info);
     userStore.getUserInfo(userInfo);
     await permissionStore.initRoutes(info.role);
-
-    Toast({
-        theme: "success",
-        direction: 'column',
-        message: "欢迎您，" + info.userName,
-    });
+    Toast.success("欢迎您，" + info.userName)
     await router.push("/home");
 };
 

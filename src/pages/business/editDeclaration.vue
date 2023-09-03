@@ -127,7 +127,6 @@ const declarationForm = reactive({
   formDataRules: {
     commodityId: [{required: true, message: "商品id必填", type: "error"}],
     expectPayback: [{required: true, message: "预计返款金额必填", type: "error"}],
-    notes: [{required: true, message: "备注必填", type: "error"}],
     orderId: [{required: true, message: "订单号必填", type: "error"}],
     payAmount: [{required: true, message: "实付金额必填", type: "error"}]
   },
