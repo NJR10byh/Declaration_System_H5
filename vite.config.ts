@@ -56,7 +56,7 @@ export default ({mode}: ConfigEnv): UserConfig => {
 
         server: {
             port: 3006,
-            host: "localhost",
+            host: true,
             proxy: {
                 "/userReport": { /* 测试环境 */
                     target: "http://47.113.188.245:8900",
