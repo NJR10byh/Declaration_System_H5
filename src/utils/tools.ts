@@ -6,6 +6,7 @@
  */
 
 import {isNotEmpty} from "@/utils/validate";
+import copy from 'copy-to-clipboard';
 import {Toast} from "tdesign-mobile-vue";
 
 /**
@@ -14,7 +15,7 @@ import {Toast} from "tdesign-mobile-vue";
  */
 export const copyInfo = (info: string) => {
     if (isNotEmpty(info)) {
-        navigator.clipboard.writeText(info);
+        copy(info);
         Toast.success("已复制")
     } else {
         Toast.error("复制值为空")
