@@ -68,23 +68,17 @@ export const validateFile = (params: { files: any; type: any; }) => {
  * @param requestUrl
  * @param formData
  */
-export const uploadFile = async (requestUrl: string, formData: FormData, progressCallback: (percentCompleted: number) => void) => {
-    return new Promise((resolve, reject) => {
-        request.post({
-            url: requestUrl,
-            data: formData,
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
-            timeout: 30 * 1000,
-            onUploadProgress: progressEvent => {
-                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                progressCallback(percentCompleted); // 调用回调函数传递进度信息
-            }
-        }).then(res => {
-            resolve(res);
-        }).catch(err => {
-            reject(err);
-        });
-    });
+export const uploadFile = (requestUrl: string, formData: FormData, progressCallback: (percentCompleted: number) => void) => {
+    return request.post({
+        url: requestUrl,
+        data: formData,
+        headers: {
+            "Content-Type": "multipart/form-data"
+        },
+        timeout: 30 * 1000,
+        onUploadProgress: progressEvent => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            progressCallback(percentCompleted); // 调用回调函数传递进度信息
+        }
+    })
 };

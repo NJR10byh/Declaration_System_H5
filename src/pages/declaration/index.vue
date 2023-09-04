@@ -44,7 +44,7 @@
             </template>
           </t-input>
         </t-form-item>
-        <t-form-item label="备注" name="notes">
+        <t-form-item label="备注">
           <t-textarea v-model="declarationForm.formData.notes" borderless placeholder="请输入备注" :maxlength="50"
                       indicator/>
         </t-form-item>
@@ -103,6 +103,8 @@ const goodsInfo = route.query;
 
 const uploadOrderPic = ref();
 const orderPic = ref([]);
+
+const orderPicFile = ref();
 /**
  * data
  */
@@ -146,51 +148,6 @@ const uploadFail = ({file}) => {
     message: `文件 ${file.name} 上传失败`,
   })
 };
-
-// 提交
-const declarationFormSubmit = async ({validateResult}) => {
-  declarationForm.submitBtnLoading = true;
-  await uploadOrderPic.value.uploadFiles();
-  setTimeout(() => {
-    console.log(declarationForm.formData)
-    console.log(validateResult)
-    if (validateResult === true) {
-      console.log(declarationForm.formData)
-      if (isEmpty(declarationForm.formData.orderPic)) {
-        Toast({
-          icon: () => h(ErrorCircleIcon),
-          direction: 'column',
-          message: "请上传下单图",
-        });
-        declarationForm.submitBtnLoading = false;
-        return;
-      }
-      request.post({
-        url: BASE_URL.declaration,
-        data: declarationForm.formData
-      }).then(res => {
-        console.log(res);
-        Toast({
-          theme: "success",
-          direction: 'column',
-          message: "报单成功",
-        });
-        router.push("/home");
-      }).catch(err => {
-        Toast({
-          icon: () => h(ErrorCircleIcon),
-          direction: 'column',
-          message: err.message,
-        });
-      }).finally(() => {
-        declarationForm.submitBtnLoading = false;
-      })
-    } else {
-      declarationForm.submitBtnLoading = false;
-    }
-  }, 800)
-}
-
 /**
  * 业务相关
  */
@@ -204,31 +161,66 @@ const beforeUpload = (file: { type: string; }) => {
 
 // 上传收款码-下单图
 const uploadPic_order = (file: any) => {
+  orderPicFile.value = [];
   if (isNotEmpty(file.raw)) {
-    return new Promise((resolve, reject) => {
-      let params = {
-        orderId: declarationForm.formData.orderId,
-        fileFlag: 0
-      }
-      let fileFormData = new FormData();
-      fileFormData.append("file", file.raw);
-      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
-      uploadFile(requestUrl, fileFormData, percentCompleted => {
-        orderPic.value[0].percent = percentCompleted;
-        if (percentCompleted === 100) {
-          orderPic.value[0].status = "success";
-        }
-      }).then(res => {
-        Object.assign(declarationForm.formData, {
-          orderPic: String(res)
-        });
-        resolve(res);
-      }).catch(err => {
-        console.error(err);
-        reject(err);
-      }).finally(() => {
-      })
+    orderPicFile.value = file;
+  }
+}
+
+// 提交
+const declarationFormSubmit = async ({validateResult}) => {
+  declarationForm.submitBtnLoading = true;
+  uploadOrderPic.value.uploadFiles();
+  console.log(orderPicFile)
+  let fileFormData = new FormData();
+  fileFormData.append("file", orderPicFile.value.raw);
+  let params = {
+    orderId: declarationForm.formData.orderId,
+    fileFlag: 0
+  }
+  let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+  let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
+    orderPic.value[0].percent = percentCompleted;
+    if (percentCompleted === 100) {
+      orderPic.value[0].status = "success";
+    }
+  })
+  Object.assign(declarationForm.formData, {
+    orderPic: uploadRes
+  })
+  if (validateResult === true) {
+    console.log(declarationForm.formData)
+    if (isEmpty(declarationForm.formData.orderPic)) {
+      Toast({
+        icon: () => h(ErrorCircleIcon),
+        direction: 'column',
+        message: "请上传下单图",
+      });
+      declarationForm.submitBtnLoading = false;
+      return;
+    }
+    request.post({
+      url: BASE_URL.declaration,
+      data: declarationForm.formData
+    }).then(res => {
+      console.log(res);
+      Toast({
+        theme: "success",
+        direction: 'column',
+        message: "报单成功",
+      });
+      router.push("/home");
+    }).catch(err => {
+      Toast({
+        icon: () => h(ErrorCircleIcon),
+        direction: 'column',
+        message: err.message,
+      });
+    }).finally(() => {
+      declarationForm.submitBtnLoading = false;
     })
+  } else {
+    declarationForm.submitBtnLoading = false;
   }
 }
 const to_home = () => {
