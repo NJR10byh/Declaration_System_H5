@@ -45,13 +45,12 @@
 </template>
 
 <script setup lang="ts">
-import {h, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import GoodsCard from "@/pages/home/GoodsCard.vue";
 import router from "@/router";
 import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
 import {setObjToUrlParams} from "@/utils/request/utils";
-import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 import {Toast} from "tdesign-mobile-vue";
 
 /**
@@ -116,11 +115,7 @@ const getGoodsList = () => {
     console.log(res);
     goodsList.value = res;
   }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
+    Toast.error(err.message)
   }).finally(() => {
     refreshing.value = false;
     loading.value = false;

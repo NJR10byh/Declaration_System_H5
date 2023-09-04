@@ -27,13 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import {h, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
 import {timestampToDateTime} from "@/utils/date";
 import {Toast} from "tdesign-mobile-vue";
-import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 
 const router = useRouter();
 
@@ -84,11 +83,7 @@ const getMyBill = () => {
     console.log(res);
     billList.value = res;
   }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
+    Toast.error(err.message)
   }).finally(() => {
     loading.value = false;
   })

@@ -247,11 +247,7 @@ const onSubmit = ({validateResult}) => {
         localStorage.setItem("token", res.token);
         userInfoToCache(res.userInfo);
       }).catch(err => {
-        Toast({
-          icon: () => h(ErrorCircleIcon),
-          direction: 'column',
-          message: err.message,
-        });
+        Toast.error(err.message)
       }).finally(() => {
         loginParams.btnLoading = false;
       });
@@ -293,7 +289,6 @@ const uploadALiPayCode = (file: any) => {
         });
         resolve(res);
       }).catch(err => {
-        console.error(err);
         reject(err);
       }).finally(() => {
       })
@@ -323,7 +318,6 @@ const uploadWeChatCode = (file: any) => {
         });
         resolve(res);
       }).catch(err => {
-        console.error(err);
         reject(err);
       }).finally(() => {
       })
@@ -349,20 +343,10 @@ const registerConfirm = async ({validateResult}) => {
         url: BASE_URL.register,
         data: registerForm.formData
       }).then(res => {
-        console.log(res);
-        Toast({
-          theme: "success",
-          direction: 'column',
-          message: "注册成功",
-        });
+        Toast.success("注册成功")
         tabValue.value = "登录";
       }).catch(err => {
-        console.log(err)
-        Toast({
-          icon: () => h(ErrorCircleIcon),
-          direction: 'column',
-          message: err.message,
-        });
+        Toast.error(err.message)
       }).finally(() => {
         registerForm.submitBtnLoading = false;
       })

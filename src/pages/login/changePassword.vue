@@ -100,18 +100,10 @@ const onSubmit = () => {
     url: BASE_URL.updatePassword,
     data: changePasswordFormData
   }).then(res => {
-    Toast({
-      theme: "success",
-      direction: 'column',
-      message: '修改成功',
-    });
+    Toast.success("修改成功")
     window.history.back();
   }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
+    Toast.error(err.message)
   }).finally(() => {
     submitBtnLoading.value = false;
   });

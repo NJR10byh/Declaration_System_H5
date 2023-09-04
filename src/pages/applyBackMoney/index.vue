@@ -178,11 +178,7 @@ const getDeclarationDetails = (id: any) => {
       }]
     }
   }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
+    Toast.error(err.message)
   })
 }
 
@@ -246,11 +242,7 @@ const declarationFormSubmit = async () => {
       data: applyForRefundFormData
     }).then(res => {
       console.log(res);
-      Toast({
-        theme: "success",
-        direction: 'column',
-        message: "申请返款成功",
-      });
+      Toast.success("申请返款成功")
       window.history.back();
     }).catch(err => {
       Toast({

@@ -181,11 +181,7 @@ const declarationFormSubmit = async ({validateResult}) => {
         data: declarationForm.formData
       }).then(res => {
         console.log(res);
-        Toast({
-          theme: "success",
-          direction: 'column',
-          message: "报单成功",
-        });
+        Toast.success("报单成功")
         router.push("/home");
       }).catch(err => {
         Toast({
@@ -220,11 +216,7 @@ const getDeclarationDetails = (id: any) => {
       }]
     }
   }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
+    Toast.error(err.message)
   })
 }
 /**

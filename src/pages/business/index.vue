@@ -59,14 +59,13 @@
 </template>
 
 <script setup lang="ts">
-import {h, onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {useRoute} from "vue-router";
 import router from "@/router";
 import DeclarationCard from "@/pages/business/DeclarationCard.vue";
 import {request} from "@/utils/request";
 import {BASE_URL} from "./constants";
 import {statusTextToCode} from "@/utils/goodStatus";
-import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 import {Toast} from "tdesign-mobile-vue";
 
 const route = useRoute();
@@ -151,11 +150,7 @@ const getStatusNums = () => {
   }).then(res => {
     Object.assign(babgeCount, res);
   }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
+    Toast.error(err.message)
   })
 }
 const getList = () => {
@@ -175,11 +170,7 @@ const getList = () => {
     pageInfo.payAmount = res.payAmount;
     pageInfo.actualPayback = res.actualPayback;
   }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
+    Toast.error(err.message)
   }).finally(() => {
     loading.value = false;
   });
@@ -191,11 +182,7 @@ const getCommodityNames = () => {
     console.log(res)
     goodsList.value = res;
   }).catch(err => {
-    Toast({
-      icon: () => h(ErrorCircleIcon),
-      direction: 'column',
-      message: err.message,
-    });
+    Toast.error(err.message)
   }).finally(() => {
   });
 }

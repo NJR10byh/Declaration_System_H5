@@ -171,7 +171,6 @@ const uploadPic_order = (file: any) => {
 const declarationFormSubmit = async ({validateResult}) => {
   declarationForm.submitBtnLoading = true;
   uploadOrderPic.value.uploadFiles();
-  console.log(orderPicFile)
   let fileFormData = new FormData();
   fileFormData.append("file", orderPicFile.value.raw);
   let params = {
@@ -189,7 +188,6 @@ const declarationFormSubmit = async ({validateResult}) => {
     orderPic: uploadRes
   })
   if (validateResult === true) {
-    console.log(declarationForm.formData)
     if (isEmpty(declarationForm.formData.orderPic)) {
       Toast({
         icon: () => h(ErrorCircleIcon),
@@ -203,12 +201,7 @@ const declarationFormSubmit = async ({validateResult}) => {
       url: BASE_URL.declaration,
       data: declarationForm.formData
     }).then(res => {
-      console.log(res);
-      Toast({
-        theme: "success",
-        direction: 'column',
-        message: "报单成功",
-      });
+      Toast.success("报单成功")
       router.push("/home");
     }).catch(err => {
       Toast({
