@@ -49,7 +49,7 @@ export const validateFileType = (targetType: string, currentType: string) => {
 export const validateFile = (params: { files: any; type: any; }) => {
     const {type} = params;
     const messageMap = {
-        FILE_OVER_SIZE_LIMIT: "文件大小超出限制，请重新上传",
+        FILE_OVER_SIZE_LIMIT: "文件大小限制1M，请重新上传",
         FILES_OVER_LENGTH_LIMIT: "文件数量超出限制，仅上传未超出数量的文件",
         FILTER_FILE_SAME_NAME: "不允许上传同名文件",
         BEFORE_ALL_FILES_UPLOAD: "beforeAllFilesUpload 方法拦截了文件",
