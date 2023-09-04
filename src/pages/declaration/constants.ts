@@ -6,5 +6,6 @@
  */
 export const BASE_URL = {
     declaration: "/declaration",
+    isRepeatOrderId: "/isRepeatOrderId",
     uploadImgFile: "/uploadImgFile"
 }

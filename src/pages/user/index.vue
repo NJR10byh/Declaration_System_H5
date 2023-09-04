@@ -6,9 +6,12 @@
 -->
 <template>
   <div class="user-container">
-    <t-avatar image="https://tdesign.gtimg.com/mobile/demos/avatar_1.png" size="large"
-              style="margin-top: 60px"></t-avatar>
-    <div style="margin-top: 10px;font-size: 15px;color: #888;">测试用户</div>
+    <t-avatar size="large" style="margin-top: 60px">
+      <template #icon>
+        <t-icon name="user"/>
+      </template>
+    </t-avatar>
+    <div style="margin-top: 10px;font-size: 15px;color: #888;">{{ userInfo.userName }}</div>
     <div class="grid-demo">
       <t-grid :column="4" theme="card" border>
         <t-grid-item text="已报单" @click="to_business('已报单')">
@@ -79,6 +82,10 @@ import {onMounted, ref} from "vue";
 import router from "@/router";
 import {request} from "@/utils/request";
 import {Toast} from "tdesign-mobile-vue";
+import {useUserStore} from "@/store";
+
+const userStore = useUserStore();
+const {userInfo} = userStore;
 
 /**
  * data
@@ -156,10 +163,11 @@ const handleLogout = async () => {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  padding-bottom: 70px;
 
   .grid-demo {
     width: 100%;
-    margin-top: 70px;
+    margin-top: 50px;
 
     .t-grid-item :deep(.t-grid-item__image) {
       background: #fff;

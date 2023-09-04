@@ -16,7 +16,7 @@
       <t-cell title="商品名称" :note="route.query.commodity"/>
       <t-cell title="实付金额">
         <template #note>
-          <span>{{ applyForRefundFormData.actualPayback }}</span>元
+          <span>{{ applyForRefundFormData.payAmount }}</span>元
         </template>
       </t-cell>
       <t-cell title="物流单号">
@@ -27,7 +27,7 @@
       </t-cell>
       <t-cell title="预计返款金额">
         <template #note>
-          <span>{{ applyForRefundFormData.examineTime }}</span>元
+          <span>{{ applyForRefundFormData.expectPayback }}</span>元
         </template>
       </t-cell>
     </t-cell-group>
@@ -55,7 +55,6 @@
             theme="image"
             accept="image/*"
             :before-upload="beforeUpload"
-            :request-method="uploadFinishPic"
             :size-limit="{ size: 1, unit: 'MB' }"
             @validate="validateFile"
             @fail="uploadFail"
@@ -111,16 +110,12 @@ const applyForRefundFormData = reactive({
   applyPaybackTime: "",
   commodityId: "",
   examineNotes: "",
-  examineTime: "",
+  expectPayback: "",
   finishPic: "",
   notes: "",
   orderId: "",
   orderPic: "",
   payAmount: "",
-  payStatId: "",
-  paybackTime: "",
-  reportTime: "",
-  reporterId: "",
   status: "",
   trackNum: ""
 })
@@ -188,31 +183,7 @@ const getDeclarationDetails = (id: any) => {
 const beforeUpload = (file: { type: string; }) => {
   return validateFileType("image/*", file.type);
 };
-// 上传订单完成图
-const uploadFinishPic = (file: any) => {
-  if (isNotEmpty(file.raw)) {
-    let params = {
-      orderId: applyForRefundFormData.orderId,
-      fileFlag: 1
-    }
-    let fileFormData = new FormData();
-    fileFormData.append("file", file.raw);
-    let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
-    uploadFile(requestUrl, fileFormData, percentCompleted => {
-      finishPic.value[0].percent = percentCompleted;
-      if (percentCompleted === 100) {
-        finishPic.value[0].status = "success";
-      }
-    }).then(res => {
-      Object.assign(applyForRefundFormData, {
-        finishPic: String(res)
-      });
-    }).catch(err => {
-      console.error(err);
-    }).finally(() => {
-    })
-  }
-}
+
 // 申请返款确认
 const declarationFormSubmit = async () => {
   submitBtnLoading.value = true;
@@ -225,35 +196,47 @@ const declarationFormSubmit = async () => {
     submitBtnLoading.value = false;
     return;
   }
-  uploadFinish.value.uploadFiles();
-  setTimeout(() => {
-    console.log(applyForRefundFormData.finishPic);
-    if (isEmpty(applyForRefundFormData.finishPic)) {
-      Toast({
-        theme: "error",
-        direction: 'column',
-        message: "请上传订单完成图",
-      });
-      submitBtnLoading.value = false;
-      return;
+  if (isEmpty(finishPic.value)) {
+    Toast({
+      theme: "error",
+      direction: 'column',
+      message: "请上传订单完成图",
+    });
+    submitBtnLoading.value = false;
+    return;
+  }
+  let params = {
+    orderId: applyForRefundFormData.orderId,
+    fileFlag: 1
+  }
+  let fileFormData = new FormData();
+  fileFormData.append("file", finishPic.value[0].raw);
+  let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+  let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
+    finishPic.value[0].percent = percentCompleted;
+    if (percentCompleted === 100) {
+      finishPic.value[0].status = "success";
     }
-    request.post({
-      url: BASE_URL.applyForRefund,
-      data: applyForRefundFormData
-    }).then(res => {
-      console.log(res);
-      Toast.success("申请返款成功")
-      window.history.back();
-    }).catch(err => {
-      Toast({
-        icon: () => h(ErrorCircleIcon),
-        direction: 'column',
-        message: err.message,
-      });
-    }).finally(() => {
-      submitBtnLoading.value = false;
-    })
-  }, 1500)
+  })
+  Object.assign(applyForRefundFormData, {
+    finishPic: uploadRes
+  });
+  request.post({
+    url: BASE_URL.applyForRefund,
+    data: applyForRefundFormData
+  }).then(res => {
+    console.log(res);
+    Toast.success("申请返款成功")
+    window.history.back();
+  }).catch(err => {
+    Toast({
+      icon: () => h(ErrorCircleIcon),
+      direction: 'column',
+      message: err.message,
+    });
+  }).finally(() => {
+    submitBtnLoading.value = false;
+  })
 }
 </script>
 

@@ -28,16 +28,19 @@
       <div class="declarationContent">
         <div class="contentInfo">
           <div style="width: 50%;">订单号：{{ declarationInfo.orderId }}</div>
-          <div style="width: 50%;">实付金额：{{ declarationInfo.payAmount }} 元</div>
+          <div style="width: 50%;">实付金额：{{ declarationInfo.payAmount ? declarationInfo.payAmount : "-" }} 元</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 100%;">预计返款金额：{{ declarationInfo.actualPayback }} 元</div>
+          <div style="width: 100%;">预计返款金额：{{
+              declarationInfo.expectPayback ? declarationInfo.expectPayback : "-"
+            }} 元
+          </div>
         </div>
         <div class="contentInfo">
           <div style="width: 100%;">报单时间：{{ timestampToDateTime(declarationInfo.reportTime) }}</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 100%;">订单备注：{{ declarationInfo.examineNotes }}</div>
+          <div style="width: 100%;">订单备注：{{ declarationInfo.notes }}</div>
         </div>
         <div class="contentInfo" style="margin-top: 20px;">
           <div style="width: 100%;">申请返款时间：{{ timestampToDateTime(declarationInfo.paybackTime) }}</div>
@@ -49,12 +52,14 @@
           <div style="width: 100%;">结算时间：{{ timestampToDateTime(declarationInfo.payTime) }}</div>
         </div>
         <div class="contentInfo">
-          <div style="width: 100%;">结算金额：{{ declarationInfo.settlementAmount }} 元</div>
+          <div style="width: 100%;">
+            结算金额：{{ declarationInfo.settlementAmount ? declarationInfo.settlementAmount : "-" }} 元
+          </div>
         </div>
         <div class="contentInfo">
           <div style="width: 100%;">审核备注：{{ declarationInfo.examineNotes }}</div>
         </div>
-        <div class="contentBtns">
+        <div class="contentBtns" v-if="declarationInfo.status===0">
           <t-button theme="light" size="small" style="margin-right: 5px;" @click="editOrder(declarationInfo)">修改报单
           </t-button>
           <t-button theme="primary" size="small" @click="applyBackMoney(declarationInfo)">申请返款</t-button>

@@ -23,6 +23,7 @@
           reset-type="initial"
           labelWidth="110px"
           label-align="left"
+          colon
           @submit="declarationFormSubmit"
       >
         <t-form-item label="订单号" name="orderId">
@@ -59,7 +60,6 @@
                 theme="image"
                 accept="image/*"
                 :before-upload="beforeUpload"
-                :request-method="uploadPic_order"
                 :size-limit="{ size: 1, unit: 'MB' }"
                 @validate="validateFile"
                 @fail="uploadFail"
@@ -87,9 +87,9 @@ import {useRoute, useRouter} from "vue-router";
 import {BASE_URL} from "./constants";
 import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 import {uploadFile, validateFile, validateFileType} from "@/utils/files";
-import {isEmpty, isNotEmpty} from "@/utils/validate";
 import {setObjToUrlParams} from "@/utils/request/utils";
 import {request} from "@/utils/request";
+import {isEmpty} from "@/utils/validate";
 
 const route = useRoute();
 const router = useRouter();
@@ -155,60 +155,61 @@ const beforeUpload = (file: { type: string; }) => {
   return validateFileType("image/*", file.type);
 };
 
-
-// 上传收款码-下单图
-const uploadPic_order = (file: any) => {
-  orderPicFile.value = [];
-  if (isNotEmpty(file.raw)) {
-    orderPicFile.value = file;
-  }
-}
-
 // 提交
 const declarationFormSubmit = async ({validateResult}) => {
-  declarationForm.submitBtnLoading = true;
-  uploadOrderPic.value.uploadFiles();
-  let fileFormData = new FormData();
-  fileFormData.append("file", orderPicFile.value.raw);
-  let params = {
-    orderId: declarationForm.formData.orderId,
-    fileFlag: 0
+  if (isEmpty(orderPic.value)) {
+    Toast({
+      theme: "error",
+      direction: 'column',
+      message: "请上传下单图",
+    });
+    return;
   }
-  let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
-  let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
-    orderPic.value[0].percent = percentCompleted;
-    if (percentCompleted === 100) {
-      orderPic.value[0].status = "success";
-    }
-  })
-  Object.assign(declarationForm.formData, {
-    orderPic: uploadRes
-  })
   if (validateResult === true) {
-    if (isEmpty(declarationForm.formData.orderPic)) {
+    declarationForm.submitBtnLoading = true;
+    try {
+      await request.post({
+        url: setObjToUrlParams(BASE_URL.isRepeatOrderId, {orderId: declarationForm.formData.orderId})
+      })
+      let fileFormData = new FormData();
+      fileFormData.append("file", orderPic.value[0].raw);
+      let params = {
+        orderId: declarationForm.formData.orderId,
+        fileFlag: 0
+      }
+      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+      let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
+        orderPic.value[0].percent = percentCompleted;
+        if (percentCompleted === 100) {
+          orderPic.value[0].status = "success";
+        }
+      })
+      Object.assign(declarationForm.formData, {
+        orderPic: uploadRes
+      })
+      request.post({
+        url: BASE_URL.declaration,
+        data: declarationForm.formData
+      }).then(res => {
+        Toast.success("报单成功")
+        router.push("/home");
+      }).catch(err => {
+        Toast({
+          icon: () => h(ErrorCircleIcon),
+          direction: 'column',
+          message: err.message,
+        });
+      }).finally(() => {
+        declarationForm.submitBtnLoading = false;
+      })
+    } catch (e) {
       Toast({
         icon: () => h(ErrorCircleIcon),
         direction: 'column',
-        message: "请上传下单图",
+        message: e.message,
       });
       declarationForm.submitBtnLoading = false;
-      return;
     }
-    request.post({
-      url: BASE_URL.declaration,
-      data: declarationForm.formData
-    }).then(res => {
-      Toast.success("报单成功")
-      router.push("/home");
-    }).catch(err => {
-      Toast({
-        icon: () => h(ErrorCircleIcon),
-        direction: 'column',
-        message: err.message,
-      });
-    }).finally(() => {
-      declarationForm.submitBtnLoading = false;
-    })
   } else {
     declarationForm.submitBtnLoading = false;
   }

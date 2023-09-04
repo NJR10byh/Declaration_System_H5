@@ -17,19 +17,18 @@
         label-width="110px"
         @submit="onSubmit"
         colon
-
         class="formStyle"
     >
-      <t-form-item label="手机号" name="phone">
+      <t-form-item label="手机号" name="phoneNum">
         <t-input v-model="userInfoFormData.phoneNum" borderless placeholder="请输入手机号"/>
       </t-form-item>
-      <t-form-item label="姓名" name="name">
+      <t-form-item label="姓名" name="userName">
         <t-input v-model="userInfoFormData.userName" borderless placeholder="请输入姓名"/>
       </t-form-item>
       <t-form-item label="开户行名称" name="bankName">
         <t-input v-model="userInfoFormData.bankName" borderless placeholder="请输入开户行名称"/>
       </t-form-item>
-      <t-form-item label="银行卡号" name="bankCard">
+      <t-form-item label="银行卡号" name="bankNum">
         <t-input v-model="userInfoFormData.bankNum" borderless placeholder="请输入银行卡号"/>
       </t-form-item>
       <t-form-item label="支付宝收款码" name="zfbPic">
@@ -44,7 +43,6 @@
             theme="image"
             accept="image/*"
             :before-upload="beforeUpload"
-            :request-method="uploadALiPayCode"
             :size-limit="{ size: 1, unit: 'MB' }"
             @validate="validateFile"
             @fail="uploadFail"
@@ -62,7 +60,6 @@
             theme="image"
             accept="image/*"
             :before-upload="beforeUpload"
-            :request-method="uploadWeChatCode"
             :size-limit="{ size: 1, unit: 'MB' }"
             @validate="validateFile"
             @fail="uploadFail"
@@ -82,10 +79,9 @@ import {Toast} from "tdesign-mobile-vue";
 import {useUserStore} from "@/store";
 import {BASE_URL} from "./constants";
 import {uploadFile, validateFile, validateFileType} from "@/utils/files";
-import {isNotEmpty} from "@/utils/validate";
+import {isEmpty, isNotEmpty} from "@/utils/validate";
 import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 import {request} from "@/utils/request";
-import router from "@/router";
 import {setObjToUrlParams} from "@/utils/request/utils";
 
 const userStore = useUserStore();
@@ -106,7 +102,12 @@ const userInfoFormData = reactive({
   zfbPic: "",
   wxPic: ""
 })
-const userInfoFormDataRules = reactive([])
+const userInfoFormDataRules = reactive({
+  phoneNum: [{required: true, message: "手机号必填", trigger: "blur"}],
+  userName: [{required: true, message: "姓名必填", trigger: "blur"}],
+  bankName: [{required: true, message: "开户行名称必填", trigger: "blur"}],
+  bankNum: [{required: true, message: "银行卡号必填", trigger: "blur"}]
+})
 
 const uploadZfbPic = ref();
 const uploadWxPic = ref();
@@ -153,11 +154,72 @@ const uploadFail = ({file}) => {
   })
 };
 // 提交
-const onSubmit = async () => {
+const onSubmit = async ({validateResult}) => {
   await Promise.all([uploadZfbPic.value.uploadFiles(), uploadWxPic.value.uploadFiles()]);
   console.log(userInfoFormData)
-  submitBtnLoading.value = true;
-  setTimeout(() => {
+  if (isEmpty(zfbPic.value)) {
+    Toast({
+      theme: "error",
+      direction: 'column',
+      message: "请上传支付宝收款码",
+    });
+    return;
+  }
+  if (isEmpty(wxPic.value)) {
+    Toast({
+      theme: "error",
+      direction: 'column',
+      message: "请上传微信收款码",
+    });
+    return;
+  }
+  if (validateResult === true) {
+    submitBtnLoading.value = true;
+    /**
+     * 支付宝付款码上传
+     */
+    if (isNotEmpty(zfbPic.value[0].raw)) {
+      let zfbParams = {
+        phoneNum: userInfoFormData.phoneNum,
+        userName: userInfoFormData.userName,
+        fileFlag: 2
+      }
+      console.log(zfbPic.value)
+      let zfbFileFormData = new FormData();
+      zfbFileFormData.append("file", zfbPic.value[0].raw);
+      let zfbRequestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, zfbParams);
+      let uploadZfbRes = await uploadFile(zfbRequestUrl, zfbFileFormData, percentCompleted => {
+        zfbPic.value[0].percent = percentCompleted;
+        if (percentCompleted === 100) {
+          zfbPic.value[0].status = "success";
+        }
+      })
+      Object.assign(userInfoFormData, {
+        zfbPic: uploadZfbRes
+      });
+    }
+    /**
+     * 微信付款码上传
+     */
+    if (isNotEmpty(wxPic.value[0].raw)) {
+      let wxParams = {
+        phoneNum: userInfoFormData.phoneNum,
+        userName: userInfoFormData.userName,
+        fileFlag: 3
+      }
+      let wxFileFormData = new FormData();
+      wxFileFormData.append("file", wxPic.value[0].raw);
+      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, wxParams);
+      let uploadWxRes = await uploadFile(requestUrl, wxFileFormData, percentCompleted => {
+        wxPic.value[0].percent = percentCompleted;
+        if (percentCompleted === 100) {
+          wxPic.value[0].status = "success";
+        }
+      })
+      Object.assign(userInfoFormData, {
+        wxPic: uploadWxRes
+      });
+    }
     request.post({
       url: BASE_URL.editPersonalInfo,
       data: userInfoFormData
@@ -165,7 +227,7 @@ const onSubmit = async () => {
       if (res) {
         Toast.success("修改成功");
         userStore.getUserInfo(res);
-        router.push("/user")
+        window.history.back();
       }
     }).catch(err => {
       Toast({
@@ -176,7 +238,7 @@ const onSubmit = async () => {
     }).finally(() => {
       submitBtnLoading.value = false;
     });
-  }, 800)
+  }
 }
 
 /**

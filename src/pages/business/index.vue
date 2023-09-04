@@ -5,14 +5,14 @@
   * @version 0.8.0
 -->
 <template>
-  <t-tabs v-model="tabValue" :space-evenly="false" :sticky="true" @change="changeTab">
-    <t-tab-panel value="今日" :badge-props="{ count: babgeCount.fiveCount, offset: [-8, 3] }" label="今日"/>
-    <t-tab-panel value="全部" :badge-props="{ count: babgeCount.totalCount, offset: [-8, 3] }" label="全部"/>
-    <t-tab-panel value="已报单" :badge-props="{ count: babgeCount.zeroCount, offset: [-8, 3] }" label="已报单"/>
-    <t-tab-panel value="待审核" :badge-props="{ count: babgeCount.oneCount, offset: [-8, 3] }" label="待审核"/>
-    <t-tab-panel value="待返款" :badge-props="{ count: babgeCount.twoCount, offset: [-8, 3] }" label="待返款"/>
-    <t-tab-panel value="已返款" :badge-props="{ count: babgeCount.threeCount, offset: [-8, 3] }" label="已返款"/>
-    <t-tab-panel value="已作废" :badge-props="{ count: babgeCount.fourCount, offset: [-8, 3] }" label="已作废"/>
+  <t-tabs v-model="tabValue" :space-evenly="false" :sticky="true" bottomLineMode="auto" @change="changeTab">
+    <t-tab-panel value="今日" :badge-props="{ count: babgeCount.fiveCount, offset: [-3, 0] }" label="今日"/>
+    <t-tab-panel value="全部" :badge-props="{ count: babgeCount.totalCount, offset: [-3, 0] }" label="全部"/>
+    <t-tab-panel value="已报单" :badge-props="{ count: babgeCount.zeroCount, offset: [-3, 0] }" label="已报单"/>
+    <t-tab-panel value="待审核" :badge-props="{ count: babgeCount.oneCount, offset: [-3, 0] }" label="待审核"/>
+    <t-tab-panel value="待返款" :badge-props="{ count: babgeCount.twoCount, offset: [-3, 0] }" label="待返款"/>
+    <t-tab-panel value="已返款" :badge-props="{ count: babgeCount.threeCount, offset: [-3, 0] }" label="已返款"/>
+    <t-tab-panel value="已作废" :badge-props="{ count: babgeCount.fourCount, offset: [-3, 0] }" label="已作废"/>
   </t-tabs>
   <div class="business-container">
     <div class="topSearch">

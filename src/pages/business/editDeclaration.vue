@@ -26,7 +26,7 @@
           @submit="declarationFormSubmit"
       >
         <t-form-item label="订单号" name="orderId">
-          <t-input v-model="declarationForm.formData.orderId" borderless placeholder="请输入订单号"/>
+          <t-input v-model="declarationForm.formData.orderId" borderless placeholder="请输入订单号" readonly disabled/>
         </t-form-item>
         <t-form-item label="实付金额" name="payAmount">
           <t-input v-model="declarationForm.formData.payAmount" borderless placeholder="请输入实付金额">
@@ -36,7 +36,7 @@
           </t-input>
         </t-form-item>
         <t-form-item label="预计返款金额" name="expectPayback">
-          <t-input v-model="declarationForm.formData.expectPayback" borderless placeholder="请输入预计返款金额">
+          <t-input v-model="declarationForm.formData.expectPayback" borderless readonly disabled>
             <template #suffixIcon>
               <div style="font-size: 15px">元</div>
             </template>
@@ -59,7 +59,6 @@
                 theme="image"
                 accept="image/*"
                 :before-upload="beforeUpload"
-                :request-method="uploadPic_order"
                 :size-limit="{ size: 1, unit: 'MB' }"
                 @validate="validateFile"
                 @fail="uploadFail"
@@ -145,46 +144,6 @@ const uploadFail = ({file}) => {
   })
 };
 
-// 提交
-const declarationFormSubmit = async ({validateResult}) => {
-  declarationForm.submitBtnLoading = true;
-  await uploadOrderPic.value.uploadFiles();
-  setTimeout(() => {
-    console.log(declarationForm.formData)
-    console.log(validateResult)
-    if (validateResult === true) {
-      console.log(declarationForm.formData)
-      if (isEmpty(declarationForm.formData.orderPic)) {
-        Toast({
-          icon: () => h(ErrorCircleIcon),
-          direction: 'column',
-          message: "请上传下单图",
-        });
-        declarationForm.submitBtnLoading = false;
-        return;
-      }
-      request.post({
-        url: BASE_URL.declaration,
-        data: declarationForm.formData
-      }).then(res => {
-        console.log(res);
-        Toast.success("报单成功")
-        router.push("/home");
-      }).catch(err => {
-        Toast({
-          icon: () => h(ErrorCircleIcon),
-          direction: 'column',
-          message: err.message,
-        });
-      }).finally(() => {
-        declarationForm.submitBtnLoading = false;
-      })
-    } else {
-      declarationForm.submitBtnLoading = false;
-    }
-  }, 800)
-}
-
 /**
  * 业务相关
  */
@@ -213,38 +172,59 @@ const beforeUpload = (file: { type: string; }) => {
   return validateFileType("image/*", file.type);
 };
 
-
-// 上传收款码-下单图
-const uploadPic_order = (file: any) => {
-  if (isNotEmpty(file.raw)) {
-    return new Promise((resolve, reject) => {
+// 提交
+const declarationFormSubmit = async ({validateResult}) => {
+  if (isEmpty(orderPic.value)) {
+    Toast({
+      theme: "error",
+      direction: 'column',
+      message: "请上传下单图",
+    });
+    return;
+  }
+  if (validateResult === true) {
+    console.log(orderPic.value)
+    console.log(declarationForm.formData)
+    declarationForm.submitBtnLoading = true;
+    if (isNotEmpty(orderPic.value[0].raw)) {
       let params = {
+        orderId: declarationForm.formData.orderId,
         fileFlag: 0
       }
       let fileFormData = new FormData();
-      fileFormData.append("file", file.raw);
+      fileFormData.append("file", orderPic.value[0].raw);
       let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
-      uploadFile(requestUrl, fileFormData, percentCompleted => {
+      let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
         orderPic.value[0].percent = percentCompleted;
         if (percentCompleted === 100) {
           orderPic.value[0].status = "success";
         }
-      }).then(res => {
-        Object.assign(declarationForm.formData, {
-          orderPic: String(res)
-        });
-        resolve(res);
-      }).catch(err => {
-        console.error(err);
-        reject(err);
-      }).finally(() => {
       })
+      Object.assign(declarationForm.formData, {
+        orderPic: uploadRes
+      })
+    }
+    request.post({
+      url: BASE_URL.declaration,
+      data: declarationForm.formData
+    }).then(res => {
+      console.log(res);
+      Toast.success("修改报单成功")
+      window.history.back();
+    }).catch(err => {
+      Toast({
+        icon: () => h(ErrorCircleIcon),
+        direction: 'column',
+        message: err.message,
+      });
+    }).finally(() => {
+      declarationForm.submitBtnLoading = false;
     })
+  } else {
+    declarationForm.submitBtnLoading = false;
   }
 }
-const to_home = () => {
-  router.push("/home");
-}
+
 </script>
 
 <style lang="less" scoped>
