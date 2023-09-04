@@ -79,7 +79,7 @@
                   accept="image/*"
                   :before-upload="beforeUpload"
                   :request-method="uploadALiPayCode"
-                  :size-limit="{ size: 10, unit: 'MB' }"
+                  :size-limit="{ size: 1, unit: 'MB' }"
                   @validate="validateFile"
                   @fail="uploadFail"
               />
@@ -97,7 +97,7 @@
                   accept="image/*"
                   :before-upload="beforeUpload"
                   :request-method="uploadWeChatCode"
-                  :size-limit="{ size: 10, unit: 'MB' }"
+                  :size-limit="{ size: 1, unit: 'MB' }"
                   @validate="validateFile"
                   @fail="uploadFail"
               />

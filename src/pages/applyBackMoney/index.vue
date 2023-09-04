@@ -56,7 +56,7 @@
             accept="image/*"
             :before-upload="beforeUpload"
             :request-method="uploadFinishPic"
-            :size-limit="{ size: 10, unit: 'MB' }"
+            :size-limit="{ size: 1, unit: 'MB' }"
             @validate="validateFile"
             @fail="uploadFail"
         />
