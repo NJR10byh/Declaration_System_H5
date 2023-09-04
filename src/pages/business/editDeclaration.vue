@@ -23,7 +23,6 @@
           reset-type="initial"
           labelWidth="110px"
           label-align="left"
-          requiredMark
           @submit="declarationFormSubmit"
       >
         <t-form-item label="订单号" name="orderId">
@@ -106,27 +105,15 @@ const orderPic = ref([]);
  */
 const declarationForm = reactive({
   formData: {
-    id: 0,
-    orderId: 0,
-    commodityId: 0,
-    reporterId: 0,
-    trackNum: null,
-    payAmount: 0,
-    actualPayback: 0,
-    status: 0,
-    reportTime: 0,
-    applyPaybackTime: null,
-    examineTime: null,
-    paybackTime: null,
-    orderPic: "",
-    finishPic: "",
+    reportId: "",
+    commodityId: "",
+    expectPayback: "",
     notes: "",
-    examineNotes: null,
-    payStatId: null
+    orderId: "",
+    orderPic: "",
+    payAmount: ""
   },
   formDataRules: {
-    commodityId: [{required: true, message: "商品id必填", type: "error"}],
-    expectPayback: [{required: true, message: "预计返款金额必填", type: "error"}],
     orderId: [{required: true, message: "订单号必填", type: "error"}],
     payAmount: [{required: true, message: "实付金额必填", type: "error"}]
   },

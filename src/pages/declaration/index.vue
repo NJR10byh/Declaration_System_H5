@@ -23,7 +23,6 @@
           reset-type="initial"
           labelWidth="110px"
           label-align="left"
-          requiredMark
           @submit="declarationFormSubmit"
       >
         <t-form-item label="订单号" name="orderId">
@@ -118,7 +117,6 @@ const declarationForm = reactive({
     payAmount: ""
   },
   formDataRules: {
-    commodityId: [{required: true, message: "商品id必填", type: "error"}],
     orderId: [{required: true, message: "订单号必填", type: "error"}],
     payAmount: [{required: true, message: "实付金额必填", type: "error"}]
   },
