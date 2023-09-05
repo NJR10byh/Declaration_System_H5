@@ -15,7 +15,7 @@
           </div>
           <div class="declarationInfo">
             <div>{{ declarationInfo.payAmount }}</div>
-            <div>{{ timestampToDateTime(declarationInfo.payTime) }}</div>
+            <div>{{ chargeDisplayTime(declarationInfo) }}</div>
           </div>
           <div class="declarationOptions">
             <t-tag variant="light" theme="primary" style="margin-right: 0;">
@@ -74,6 +74,7 @@ import {onMounted, reactive} from "vue";
 import {timestampToDateTime} from "../../utils/date";
 import {statusCodeToText} from "../../utils/goodStatus";
 import router from "@/router";
+import {isNotEmpty} from "@/utils/validate";
 
 const props = defineProps({
   declarationInfo: Object
@@ -118,6 +119,16 @@ onMounted(() => {
 /**
  * 业务相关
  */
+// 展示时间
+const chargeDisplayTime = (declarationInfo: any) => {
+  if (isNotEmpty(declarationInfo.payTime)) {
+    return timestampToDateTime(declarationInfo.payTime);
+  } else if (isNotEmpty(declarationInfo.applyPaybackTime)) {
+    return timestampToDateTime(declarationInfo.applyPaybackTime);
+  } else {
+    return timestampToDateTime(declarationInfo.reportTime);
+  }
+}
 // 修改订单
 const editOrder = (declarationInfo: any) => {
   console.log(declarationInfo);
