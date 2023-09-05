@@ -164,9 +164,6 @@ const uploadWxPic = ref();
 const zfbPic = ref([]);
 const wxPic = ref([]);
 
-const zfbPicFile = ref();
-const wxPicFile = ref();
-
 const registerForm = reactive({
   visible: false,
   confirmBtn: {
