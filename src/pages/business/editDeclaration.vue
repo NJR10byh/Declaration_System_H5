@@ -154,6 +154,7 @@ const getDeclarationDetails = (id: any) => {
   }).then(res => {
     console.log(res);
     Object.assign(declarationForm.formData, res);
+    declarationForm.formData.reportId = id;
     if (res.orderPic.indexOf("http") !== -1) {
       orderPic.value = [{
         url: res.orderPic,
@@ -205,7 +206,7 @@ const declarationFormSubmit = async ({validateResult}) => {
       })
     }
     request.post({
-      url: BASE_URL.declaration,
+      url: BASE_URL.editDeclaration,
       data: declarationForm.formData
     }).then(res => {
       console.log(res);
