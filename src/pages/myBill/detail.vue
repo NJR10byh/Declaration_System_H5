@@ -9,7 +9,9 @@
   <div class="bill-detail-container">
     <div class="cellGroup">
       <t-cell-group theme="card">
-        <t-cell title="支付宝" :note="billDetailInfo.bankNum"/>
+        <t-cell title="支付方式" :note="getPayWay(billDetailInfo.payWay)"/>
+        <t-cell title="银行卡号" :note="billDetailInfo.bankNum" v-if="billDetailInfo.payWay===0"/>
+        <t-cell title="支付宝账号" :note="billDetailInfo.zfbNum" v-if="billDetailInfo.payWay===1"/>
         <t-cell title="结算人" :note="billDetailInfo.payUser"/>
         <t-cell title="结算时间" :note="timestampToDateTime(billDetailInfo.payTime)"/>
         <t-cell title="结算金额" :note="'¥'+billDetailInfo.settlementSum"/>
@@ -66,6 +68,23 @@ onMounted(() => {
  */
 const handleClick = () => {
   window.history.back();
+}
+/**
+ * 业务相关
+ */
+// 获取支付方式
+const getPayWay = (payWay: any) => {
+  switch (payWay) {
+    case 0:
+      return "银行卡";
+    case 1:
+      return "支付宝";
+    case 2:
+      return "微信";
+
+    default:
+      return "未知";
+  }
 }
 </script>
 
