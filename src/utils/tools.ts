@@ -6,7 +6,7 @@
  */
 
 import {isNotEmpty} from "@/utils/validate";
-import copy from 'copy-to-clipboard';
+import copy from "copy-to-clipboard";
 import {Toast} from "tdesign-mobile-vue";
 
 /**

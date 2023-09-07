@@ -20,7 +20,7 @@
         class="formStyle"
     >
       <t-form-item label="手机号" name="phoneNum">
-        <t-input v-model="userInfoFormData.phoneNum" borderless placeholder="请输入手机号"/>
+        <t-input v-model="userInfoFormData.phoneNum" borderless placeholder="请输入手机号" disabled/>
       </t-form-item>
       <t-form-item label="姓名" name="userName">
         <t-input v-model="userInfoFormData.userName" borderless placeholder="请输入姓名"/>
@@ -103,7 +103,6 @@ const userInfoFormData = reactive({
   wxPic: ""
 })
 const userInfoFormDataRules = reactive({
-  phoneNum: [{required: true, message: "手机号必填", trigger: "blur"}],
   userName: [{required: true, message: "姓名必填", trigger: "blur"}],
   bankName: [{required: true, message: "开户行名称必填", trigger: "blur"}],
   bankNum: [{required: true, message: "银行卡号必填", trigger: "blur"}]
