@@ -60,7 +60,7 @@
                 theme="image"
                 accept="image/*"
                 :before-upload="beforeUpload"
-                :size-limit="{ size: 1, unit: 'MB' }"
+                :size-limit="{ size: 3, unit: 'MB' }"
                 @validate="validateFile"
                 @fail="uploadFail"
             />

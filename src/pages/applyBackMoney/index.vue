@@ -55,7 +55,7 @@
             theme="image"
             accept="image/*"
             :before-upload="beforeUpload"
-            :size-limit="{ size: 1, unit: 'MB' }"
+            :size-limit="{ size: 3, unit: 'MB' }"
             @validate="validateFile"
             @fail="uploadFail"
         />
@@ -129,7 +129,7 @@ const submitBtnLoading = ref(false);
 // 示例图片
 const examplePicVisible = ref(false);
 const examplePic = reactive([
-  'http://47.113.188.245:8900/userReport/file/tip.jpeg'
+  'http://120.77.168.106:8900/userReport/file/tip.jpeg'
 ]);
 /**
  * methods区
