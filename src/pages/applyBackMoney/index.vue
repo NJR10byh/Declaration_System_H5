@@ -61,8 +61,8 @@
         />
       </t-form-item>
       <div class="button-group">
-        <t-button theme="primary" type="submit" :loading="submitBtnLoading"
-                  :loading-props="{theme: 'dots'}">提交
+        <t-button theme="primary" type="submit" :loading="submitBtnLoading" :loading-props="{theme: 'dots'}">
+          提交
         </t-button>
       </div>
     </t-form>
