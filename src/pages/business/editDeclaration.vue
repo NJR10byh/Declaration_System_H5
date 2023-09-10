@@ -29,14 +29,15 @@
           <t-input v-model="declarationForm.formData.orderId" borderless placeholder="请输入订单号" readonly disabled/>
         </t-form-item>
         <t-form-item label="实付金额" name="payAmount">
-          <t-input v-model="declarationForm.formData.payAmount" borderless placeholder="请输入实付金额">
+          <t-input type="number" :maxcharacter="4" v-model="declarationForm.formData.payAmount" borderless
+                   placeholder="请输入实付金额">
             <template #suffixIcon>
               <div style="font-size: 15px">元</div>
             </template>
           </t-input>
         </t-form-item>
         <t-form-item label="预计返款金额" name="expectPayback">
-          <t-input v-model="declarationForm.formData.expectPayback" borderless readonly disabled>
+          <t-input type="number" v-model="declarationForm.formData.expectPayback" borderless readonly disabled>
             <template #suffixIcon>
               <div style="font-size: 15px">元</div>
             </template>

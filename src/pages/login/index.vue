@@ -53,10 +53,11 @@
               <t-input v-model="registerForm.formData.userName" borderless placeholder="请输入姓名"/>
             </t-form-item>
             <t-form-item label="密码" name="password">
-              <t-input v-model="registerForm.formData.password" borderless placeholder="请输入密码"/>
+              <t-input type="password" v-model="registerForm.formData.password" borderless placeholder="请输入密码"/>
             </t-form-item>
             <t-form-item label="确认密码" name="confirmPassword">
-              <t-input v-model="registerForm.formData.confirmPassword" borderless placeholder="请确认密码"/>
+              <t-input type="password" v-model="registerForm.formData.confirmPassword" borderless
+                       placeholder="请确认密码"/>
             </t-form-item>
             <t-form-item label="开户行名称" name="bankName">
               <t-input v-model="registerForm.formData.bankName" borderless placeholder="请输入开户行名称"/>
