@@ -26,7 +26,9 @@
               <t-input v-model="loginParams.formData.password" borderless type="password" placeholder="请输入密码"/>
             </t-form-item>
             <div class="button-group">
-              <t-button theme="primary" type="submit" :loading="loginParams.btnLoading"
+              <t-checkbox style="width: 40%" v-model="rememberMe" borderless>记住我</t-checkbox>
+              <t-button style="width: 60%" theme="primary" type="submit"
+                        :loading="loginParams.btnLoading"
                         :loading-props="{theme: 'dots'}">
                 登 录
               </t-button>
@@ -105,7 +107,8 @@
               <t-input v-model="registerForm.formData.verifyCode" borderless placeholder="请输入邀请码"/>
             </t-form-item>
             <div class="button-group">
-              <t-button theme="primary" variant="light" type="submit" :loading="registerForm.submitBtnLoading"
+              <t-button style="width: 100%" theme="primary" variant="light" type="submit"
+                        :loading="registerForm.submitBtnLoading"
                         :loading-props="{theme: 'dots'}">
                 注册
               </t-button>
@@ -122,7 +125,7 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import {h, reactive, ref} from "vue";
+import {h, onMounted, reactive, ref} from "vue";
 import {checkAuth, userInfoToCache} from "@/utils/auth";
 import {request} from "@/utils/request";
 import {Toast} from "tdesign-mobile-vue";
@@ -131,6 +134,7 @@ import {ErrorCircleIcon} from "tdesign-icons-vue-next";
 import {isEmpty, isNotEmpty} from "@/utils/validate";
 import {uploadFile, validateFile, validateFileType} from "@/utils/files";
 import {setObjToUrlParams} from "@/utils/request/utils";
+import {Base64} from "js-base64";
 
 const tabValue = ref('登录');
 const tabList = [
@@ -204,6 +208,26 @@ const registerForm = reactive({
   submitBtnLoading: false
 });
 
+const rememberMe = ref(false);
+
+onMounted(() => {
+  const localForm = localStorage.getItem('LOCAL_KEY');
+  if (localForm) {
+    rememberMe.value = true;
+    try {
+      const {phoneNum, password} = JSON.parse(localForm)
+      Object.assign(loginParams.formData, {
+        phoneNum: Base64.decode(phoneNum),
+        password: Base64.decode(password)
+      })
+    } catch (error) {
+      console.error('本地数据解析失败~', error)
+    }
+  } else {
+    rememberMe.value = false;
+  }
+})
+
 const tabChange = (value: any) => {
   tabValue.value = value;
 }
@@ -216,23 +240,33 @@ const uploadFail = ({file}) => {
     message: `文件 ${file.name} 上传失败`,
   })
 };
-const onSubmit = ({validateResult}) => {
+const onSubmit = async ({validateResult}) => {
   if (validateResult === true) {
     loginParams.btnLoading = true;
     if (!checkAuth()) {
       localStorage.removeItem("token");
-      request.post({
+      await request.post({
         url: BASE_URL.login,
         data: loginParams.formData
       }).then(res => {
         console.log(res)
         localStorage.setItem("token", res.token);
+        if (rememberMe.value) {
+          const localForm = {
+            phoneNum: Base64.encode(loginParams.formData.phoneNum),
+            password: Base64.encode(loginParams.formData.password)
+          }
+          localStorage.setItem("LOCAL_KEY", JSON.stringify(localForm));
+        } else {
+          localStorage.removeItem("LOCAL_KEY");
+        }
         userInfoToCache(res.userInfo);
       }).catch(err => {
         Toast.error(err.message)
       }).finally(() => {
         loginParams.btnLoading = false;
       });
+      await request.get({url: BASE_URL.checkCommodity});
     } else {
       loginParams.btnLoading = false;
     }
@@ -340,7 +374,6 @@ const registerConfirm = async ({validateResult}) => {
   align-items: center;
   padding: 30px 0;
 
-
   .box {
     width: 100%;
     height: 100%;
@@ -365,11 +398,10 @@ const registerConfirm = async ({validateResult}) => {
           width: 100%;
 
           .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 10px;
-
-            .t-button {
-              width: 100%;
-            }
           }
         }
       }
