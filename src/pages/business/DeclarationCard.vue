@@ -18,6 +18,9 @@
             <div>{{ chargeDisplayTime(declarationInfo) }}</div>
           </div>
           <div class="declarationOptions">
+            <t-tag variant="light" theme="success" style="margin-right: 0;">
+              {{ declarationInfo.schemeName }}
+            </t-tag>
             <t-tag variant="light" theme="primary" style="margin-right: 0;">
               {{ statusCodeToText(declarationInfo.status) }}
             </t-tag>
@@ -187,7 +190,7 @@ const applyBackMoney = (declarationInfo: any) => {
     .declarationOptions {
       width: 100%;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
       margin-top: 10px;
     }

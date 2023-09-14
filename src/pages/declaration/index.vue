@@ -14,7 +14,7 @@
       </t-cell-group>
     </div>
 
-    <div style="width: 90%">
+    <div style="width:100%;padding: 0 16px;">
       <t-form
           ref="form"
           class="formStyle"
@@ -29,6 +29,12 @@
         <t-form-item label="订单号" name="orderId">
           <t-input v-model="declarationForm.formData.orderId" borderless placeholder="请输入订单号"/>
         </t-form-item>
+        <t-form-item label="方案" name="scheme" arrow>
+          <t-input v-model="declarationForm.formData.scheme" borderless placeholder="请选择方案" readonly
+                   @click="schemeVisible = true"/>
+          <t-action-sheet v-model="schemeVisible" description="选择方案" :items="schemeList"
+                          @selected="selectedScheme"/>
+        </t-form-item>
         <t-form-item label="实付金额" name="payAmount">
           <t-input type="number" :maxcharacter="4" v-model="declarationForm.formData.payAmount" borderless
                    placeholder="请输入实付金额">
@@ -38,7 +44,8 @@
           </t-input>
         </t-form-item>
         <t-form-item label="预计返款金额" name="expectPayback">
-          <t-input type="number" v-model="goodsInfo.expectPayback" borderless placeholder="请输入预计返款金额" readonly
+          <t-input type="number" v-model="declarationForm.formData.expectPayback" borderless
+                   placeholder="请输入预计返款金额" readonly
                    disabled>
             <template #suffixIcon>
               <div style="font-size: 15px">元</div>
@@ -84,7 +91,7 @@
 
 <script setup lang="ts">
 import {h, onMounted, reactive, ref} from "vue";
-import {Toast} from "tdesign-mobile-vue";
+import {ActionSheet, Toast} from "tdesign-mobile-vue";
 import {useRoute, useRouter} from "vue-router";
 import {BASE_URL} from "./constants";
 import {ErrorCircleIcon} from "tdesign-icons-vue-next";
@@ -92,6 +99,7 @@ import {uploadFile, validateFile, validateFileType} from "@/utils/files";
 import {setObjToUrlParams} from "@/utils/request/utils";
 import {request} from "@/utils/request";
 import {isEmpty} from "@/utils/validate";
+import {ActionSheetItem} from "tdesign-mobile-vue/es/action-sheet";
 
 const route = useRoute();
 const router = useRouter();
@@ -103,15 +111,15 @@ const goodsInfo = route.query;
 
 const uploadOrderPic = ref();
 const orderPic = ref([]);
-
-const orderPicFile = ref();
 /**
  * data
  */
 const declarationForm = reactive({
   formData: {
     commodityId: goodsInfo.id,
-    expectPayback: goodsInfo.expectPayback,
+    scheme: "",
+    schemeId: "",
+    expectPayback: 0,
     notes: "",
     orderId: "",
     orderPic: "",
@@ -119,10 +127,15 @@ const declarationForm = reactive({
   },
   formDataRules: {
     orderId: [{required: true, message: "订单号必填", type: "error"}],
+    scheme: [{required: true, message: "方案必选", type: "error"}],
     payAmount: [{required: true, message: "实付金额必填", type: "error"}]
   },
   submitBtnLoading: false
 })
+
+// 方案
+const schemeVisible = ref(false);
+const schemeList = ref([]);
 
 /**
  * methods区
@@ -130,6 +143,22 @@ const declarationForm = reactive({
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
+  console.log(goodsInfo)
+  request.post({
+    url: setObjToUrlParams(BASE_URL.listScheme, {id: goodsInfo.id})
+  }).then(res => {
+    console.log(res);
+    res.map((item: any) => {
+      let obj = {
+        label: item.schemeName,
+        schemeId: item.schemeId,
+        expectPayback: item.expectPayback
+      }
+      schemeList.value.push(obj);
+    })
+  }).catch(err => {
+    Toast.error(err.message)
+  })
   console.log(goodsInfo);
 });
 
@@ -150,6 +179,15 @@ const uploadFail = ({file}) => {
 /**
  * 业务相关
  */
+const selectedScheme = (selected: ActionSheetItem) => {
+  Object.assign(declarationForm.formData, {
+    scheme: selected.label,
+    schemeId: selected.schemeId,
+    expectPayback: selected.expectPayback
+  })
+  console.log(declarationForm.formData)
+  ActionSheet.close();
+};
 /**
  * 上传
  */
@@ -194,7 +232,17 @@ const declarationFormSubmit = async ({validateResult}) => {
         data: declarationForm.formData
       }).then(res => {
         Toast.success("报单成功")
-        router.push("/home");
+        Object.assign(declarationForm.formData, {
+          commodityId: goodsInfo.id,
+          scheme: "",
+          schemeId: "",
+          expectPayback: 0,
+          notes: "",
+          orderId: "",
+          orderPic: "",
+          payAmount: ""
+        })
+        orderPic.value = [];
       }).catch(err => {
         Toast({
           icon: () => h(ErrorCircleIcon),

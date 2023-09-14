@@ -14,7 +14,7 @@
         <t-cell title="支付宝账号" :note="billDetailInfo.zfbNum" v-if="billDetailInfo.payWay===1"/>
         <t-cell title="结算人" :note="billDetailInfo.payUser"/>
         <t-cell title="结算时间" :note="timestampToDateTime(billDetailInfo.payTime)"/>
-        <t-cell title="结算金额" :note="'¥'+billDetailInfo.settlementSum"/>
+        <t-cell title="结算金额" :note="isNotEmpty(billDetailInfo.settlementSum)?'¥'+billDetailInfo.settlementSum:''"/>
       </t-cell-group>
     </div>
 
@@ -34,6 +34,7 @@ import {timestampToDateTime} from "@/utils/date";
 import {request} from "@/utils/request";
 import {setObjToUrlParams} from "@/utils/request/utils";
 import {BASE_URL} from "@/pages/myBill/constants";
+import {isNotEmpty} from "@/utils/validate";
 
 const route = useRoute();
 const router = useRouter();
