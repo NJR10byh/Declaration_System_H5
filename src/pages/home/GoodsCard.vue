@@ -59,7 +59,7 @@ const toReport = (goodsInfo: any) => {
   console.log(goodsInfo);
   router.push({
     path: '/declaration',
-    query: goodsInfo
+    query: {id: goodsInfo.id}
   })
 }
 
