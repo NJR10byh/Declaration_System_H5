@@ -8,5 +8,6 @@ export const BASE_URL = {
     declaration: "/declaration",
     isRepeatOrderId: "/isRepeatOrderId",
     uploadImgFile: "/uploadImgFile",
-    listScheme: "/listScheme"
+    listScheme: "/listScheme",
+    getCommodityById: "/getCommodityById"
 }

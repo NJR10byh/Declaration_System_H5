@@ -10,7 +10,7 @@
     <div class="cellGroup">
       <t-cell-group theme="card">
         <t-cell title="商品名称" :note="goodsInfo.commodity"/>
-        <t-cell title="剩余额度" :note="goodsInfo.remainAmount"/>
+        <t-cell title="剩余额度" :note="isNotEmpty(goodsInfo.remainAmount)?goodsInfo.remainAmount+' 元':''"/>
       </t-cell-group>
     </div>
 
@@ -94,11 +94,11 @@ import {h, onMounted, reactive, ref} from "vue";
 import {ActionSheet, Toast} from "tdesign-mobile-vue";
 import {useRoute, useRouter} from "vue-router";
 import {BASE_URL} from "./constants";
-import {ErrorCircleIcon} from "tdesign-icons-vue-next";
+import {ErrorCircleIcon, InfoCircleIcon} from "tdesign-icons-vue-next";
 import {uploadFile, validateFile, validateFileType} from "@/utils/files";
 import {setObjToUrlParams} from "@/utils/request/utils";
 import {request} from "@/utils/request";
-import {isEmpty} from "@/utils/validate";
+import {isEmpty, isNotEmpty} from "@/utils/validate";
 import {ActionSheetItem} from "tdesign-mobile-vue/es/action-sheet";
 
 const route = useRoute();
@@ -107,7 +107,11 @@ const router = useRouter();
 /**
  * data
  */
-const goodsInfo = route.query;
+const commodityId = route.query.id;
+const goodsInfo = reactive({
+  commodity: "",
+  remainAmount: 0
+});
 
 const uploadOrderPic = ref();
 const orderPic = ref([]);
@@ -116,14 +120,14 @@ const orderPic = ref([]);
  */
 const declarationForm = reactive({
   formData: {
-    commodityId: goodsInfo.id,
+    commodityId: commodityId,
     scheme: "",
     schemeId: "",
     expectPayback: 0,
     notes: "",
     orderId: "",
     orderPic: "",
-    payAmount: ""
+    payAmount: null
   },
   formDataRules: {
     orderId: [{required: true, message: "订单号必填", type: "error"}],
@@ -143,23 +147,9 @@ const schemeList = ref([]);
 /* 生命周期 */
 // 组件挂载完成后执行
 onMounted(() => {
-  console.log(goodsInfo)
-  request.post({
-    url: setObjToUrlParams(BASE_URL.listScheme, {id: goodsInfo.id})
-  }).then(res => {
-    console.log(res);
-    res.map((item: any) => {
-      let obj = {
-        label: item.schemeName,
-        schemeId: item.schemeId,
-        expectPayback: item.expectPayback
-      }
-      schemeList.value.push(obj);
-    })
-  }).catch(err => {
-    Toast.error(err.message)
-  })
-  console.log(goodsInfo);
+  console.log(commodityId);
+  getScheme();
+  getCommodity();
 });
 
 /**
@@ -179,6 +169,38 @@ const uploadFail = ({file}) => {
 /**
  * 业务相关
  */
+// 获取方案
+const getCommodity = () => {
+  request.get({
+    url: setObjToUrlParams(BASE_URL.getCommodityById, {commodityId: commodityId})
+  }).then(res => {
+    Object.assign(goodsInfo, {
+      commodity: res.commodityName,
+      remainAmount: res.remainAmount
+    })
+  }).catch(err => {
+    Toast.error(err.message)
+  })
+}
+// 获取方案
+const getScheme = () => {
+  request.post({
+    url: setObjToUrlParams(BASE_URL.listScheme, {id: commodityId})
+  }).then(res => {
+    console.log(res);
+    res.map((item: any) => {
+      let obj = {
+        label: item.schemeName,
+        schemeId: item.schemeId,
+        expectPayback: item.expectPayback
+      }
+      schemeList.value.push(obj);
+    })
+  }).catch(err => {
+    Toast.error(err.message)
+  })
+}
+// 选择方案
 const selectedScheme = (selected: ActionSheetItem) => {
   Object.assign(declarationForm.formData, {
     scheme: selected.label,
@@ -197,9 +219,17 @@ const beforeUpload = (file: { type: string; }) => {
 
 // 提交
 const declarationFormSubmit = async ({validateResult}) => {
+  if (declarationForm.formData.payAmount > goodsInfo.remainAmount) {
+    Toast({
+      icon: () => h(InfoCircleIcon),
+      direction: 'column',
+      message: "实付金额不能大于剩余额度",
+    });
+    return;
+  }
   if (isEmpty(orderPic.value)) {
     Toast({
-      theme: "error",
+      icon: () => h(InfoCircleIcon),
       direction: 'column',
       message: "请上传下单图",
     });
@@ -232,17 +262,7 @@ const declarationFormSubmit = async ({validateResult}) => {
         data: declarationForm.formData
       }).then(res => {
         Toast.success("报单成功")
-        Object.assign(declarationForm.formData, {
-          commodityId: goodsInfo.id,
-          scheme: "",
-          schemeId: "",
-          expectPayback: 0,
-          notes: "",
-          orderId: "",
-          orderPic: "",
-          payAmount: ""
-        })
-        orderPic.value = [];
+        window.location.reload();
       }).catch(err => {
         Toast({
           icon: () => h(ErrorCircleIcon),

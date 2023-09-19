@@ -10,7 +10,8 @@
     <div class="cellGroup">
       <t-cell-group theme="card">
         <t-cell title="商品名称" :note="declarationInfo.commodity"/>
-        <t-cell title="剩余额度" :note="declarationInfo.remainAmount"/>
+        <t-cell title="剩余额度"
+                :note="isNotEmpty(declarationInfo.remainAmount)?declarationInfo.remainAmount+' 元':''"/>
       </t-cell-group>
     </div>
 
@@ -84,7 +85,7 @@ import {h, onMounted, reactive, ref} from "vue";
 import {Toast} from "tdesign-mobile-vue";
 import {useRoute, useRouter} from "vue-router";
 import {BASE_URL} from "./constants";
-import {ErrorCircleIcon} from "tdesign-icons-vue-next";
+import {ErrorCircleIcon, InfoCircleIcon} from "tdesign-icons-vue-next";
 import {uploadFile, validateFile, validateFileType} from "@/utils/files";
 import {isEmpty, isNotEmpty} from "@/utils/validate";
 import {setObjToUrlParams} from "@/utils/request/utils";
@@ -176,6 +177,14 @@ const beforeUpload = (file: { type: string; }) => {
 
 // 提交
 const declarationFormSubmit = async ({validateResult}) => {
+  if (declarationForm.formData.payAmount > declarationInfo.remainAmount) {
+    Toast({
+      icon: () => h(InfoCircleIcon),
+      direction: 'column',
+      message: "实付金额不能大于剩余额度",
+    });
+    return;
+  }
   if (isEmpty(orderPic.value)) {
     Toast({
       theme: "error",
