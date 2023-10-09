@@ -129,7 +129,7 @@ const submitBtnLoading = ref(false);
 // 示例图片
 const examplePicVisible = ref(false);
 const examplePic = reactive([
-  'http://120.77.168.106:8900/userReport/file/tip.jpeg'
+  'http://120.24.253.160:8900/userReport/file/tip.jpeg'
 ]);
 /**
  * methods区
