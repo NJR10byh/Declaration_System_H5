@@ -30,8 +30,7 @@
           <t-input v-model="declarationForm.formData.orderId" borderless placeholder="请输入订单号" readonly disabled/>
         </t-form-item>
         <t-form-item label="实付金额" name="payAmount">
-          <t-input type="number" :maxcharacter="4" v-model="declarationForm.formData.payAmount" borderless
-                   placeholder="请输入实付金额">
+          <t-input type="number" v-model="declarationForm.formData.payAmount" borderless placeholder="请输入实付金额">
             <template #suffixIcon>
               <div style="font-size: 15px">元</div>
             </template>
@@ -116,7 +115,7 @@ const declarationForm = reactive({
   },
   formDataRules: {
     orderId: [{required: true, message: "订单号必填", type: "error"}],
-    payAmount: [{required: true, message: "实付金额必填", type: "error"}]
+    payAmount: [{validator: (val: any) => val < 10000, message: '实付金额最高9999元'}]
   },
   submitBtnLoading: false
 })
