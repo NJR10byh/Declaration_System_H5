@@ -115,7 +115,7 @@ const declarationForm = reactive({
   },
   formDataRules: {
     orderId: [{required: true, message: "订单号必填", type: "error"}],
-    payAmount: [{validator: (val: any) => val < 10000, message: '实付金额最高9999元'}]
+    payAmount: [{message: '实付金额最高9999元', validator: (val: any) => val < 10000}, {required: true}]
   },
   submitBtnLoading: false
 })
