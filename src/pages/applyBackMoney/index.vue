@@ -210,18 +210,20 @@ const declarationFormSubmit = async () => {
     orderId: applyForRefundFormData.orderId,
     fileFlag: 1
   }
-  let fileFormData = new FormData();
-  fileFormData.append("file", finishPic.value[0].raw);
-  let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
-  let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
-    finishPic.value[0].percent = percentCompleted;
-    if (percentCompleted === 100) {
-      finishPic.value[0].status = "success";
-    }
-  })
-  Object.assign(applyForRefundFormData, {
-    finishPic: uploadRes
-  });
+  if (isNotEmpty(finishPic.value)) {
+    let fileFormData = new FormData();
+    fileFormData.append("file", finishPic.value[0].raw);
+    let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+    let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
+      finishPic.value[0].percent = percentCompleted;
+      if (percentCompleted === 100) {
+        finishPic.value[0].status = "success";
+      }
+    })
+    Object.assign(applyForRefundFormData, {
+      finishPic: uploadRes
+    });
+  }
   request.post({
     url: BASE_URL.applyForRefund,
     data: applyForRefundFormData

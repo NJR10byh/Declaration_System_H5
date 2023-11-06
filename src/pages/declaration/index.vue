@@ -44,7 +44,7 @@
         </t-form-item>
         <t-form-item label="预计返款金额" name="expectPayback">
           <t-input type="number" v-model="declarationForm.formData.expectPayback" borderless
-                   placeholder="请输入预计返款金额" readonly disabled>
+                   placeholder="预计返款金额" readonly disabled>
             <template #suffixIcon>
               <div style="font-size: 15px">元</div>
             </template>
@@ -246,22 +246,24 @@ const declarationFormSubmit = async ({validateResult}) => {
       await request.post({
         url: setObjToUrlParams(BASE_URL.isRepeatOrderId, {orderId: declarationForm.formData.orderId})
       })
-      let fileFormData = new FormData();
-      fileFormData.append("file", orderPic.value[0].raw);
-      let params = {
-        orderId: declarationForm.formData.orderId,
-        fileFlag: 0
-      }
-      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
-      let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
-        orderPic.value[0].percent = percentCompleted;
-        if (percentCompleted === 100) {
-          orderPic.value[0].status = "success";
+      if (isNotEmpty(orderPic.value)) {
+        let fileFormData = new FormData();
+        fileFormData.append("file", orderPic.value[0].raw);
+        let params = {
+          orderId: declarationForm.formData.orderId,
+          fileFlag: 0
         }
-      })
-      Object.assign(declarationForm.formData, {
-        orderPic: uploadRes
-      })
+        let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+        let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
+          orderPic.value[0].percent = percentCompleted;
+          if (percentCompleted === 100) {
+            orderPic.value[0].status = "success";
+          }
+        })
+        Object.assign(declarationForm.formData, {
+          orderPic: uploadRes
+        })
+      }
       request.post({
         url: BASE_URL.declaration,
         data: declarationForm.formData

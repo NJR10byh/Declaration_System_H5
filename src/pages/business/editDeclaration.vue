@@ -201,26 +201,26 @@ const declarationFormSubmit = async ({validateResult}) => {
   //   return;
   // }
   if (validateResult === true) {
-    console.log(orderPic.value)
-    console.log(declarationForm.formData)
     declarationForm.submitBtnLoading = true;
     if (isNotEmpty(orderPic.value[0].raw)) {
       let params = {
         orderId: declarationForm.formData.orderId,
         fileFlag: 0
       }
-      let fileFormData = new FormData();
-      fileFormData.append("file", orderPic.value[0].raw);
-      let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
-      let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
-        orderPic.value[0].percent = percentCompleted;
-        if (percentCompleted === 100) {
-          orderPic.value[0].status = "success";
-        }
-      })
-      Object.assign(declarationForm.formData, {
-        orderPic: uploadRes
-      })
+      if (isNotEmpty(orderPic.value)) {
+        let fileFormData = new FormData();
+        fileFormData.append("file", orderPic.value[0].raw);
+        let requestUrl = setObjToUrlParams(BASE_URL.uploadImgFile, params);
+        let uploadRes = await uploadFile(requestUrl, fileFormData, percentCompleted => {
+          orderPic.value[0].percent = percentCompleted;
+          if (percentCompleted === 100) {
+            orderPic.value[0].status = "success";
+          }
+        })
+        Object.assign(declarationForm.formData, {
+          orderPic: uploadRes
+        })
+      }
     }
     request.post({
       url: BASE_URL.editDeclaration,
