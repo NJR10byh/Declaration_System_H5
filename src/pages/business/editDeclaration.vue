@@ -86,7 +86,7 @@ import {useRoute, useRouter} from "vue-router";
 import {BASE_URL} from "./constants";
 import {ErrorCircleIcon, InfoCircleIcon} from "tdesign-icons-vue-next";
 import {uploadFile, validateFile, validateFileType} from "@/utils/files";
-import {isEmpty, isNotEmpty} from "@/utils/validate";
+import {isNotEmpty} from "@/utils/validate";
 import {setObjToUrlParams} from "@/utils/request/utils";
 import {request} from "@/utils/request";
 
@@ -191,14 +191,15 @@ const declarationFormSubmit = async ({validateResult}) => {
     });
     return;
   }
-  if (isEmpty(orderPic.value)) {
-    Toast({
-      theme: "error",
-      direction: 'column',
-      message: "请上传下单图",
-    });
-    return;
-  }
+  // 上传下单图改为非必填 --- 2023/11/06 需求
+  // if (isEmpty(orderPic.value)) {
+  //   Toast({
+  //     theme: "error",
+  //     direction: 'column',
+  //     message: "请上传下单图",
+  //   });
+  //   return;
+  // }
   if (validateResult === true) {
     console.log(orderPic.value)
     console.log(declarationForm.formData)

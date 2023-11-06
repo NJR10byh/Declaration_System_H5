@@ -196,15 +196,16 @@ const declarationFormSubmit = async () => {
     submitBtnLoading.value = false;
     return;
   }
-  if (isEmpty(finishPic.value)) {
-    Toast({
-      theme: "error",
-      direction: 'column',
-      message: "请上传订单完成图",
-    });
-    submitBtnLoading.value = false;
-    return;
-  }
+  // 上传订单完成图改为非必填 --- 2023/11/06 需求
+  // if (isEmpty(finishPic.value)) {
+  //   Toast({
+  //     theme: "error",
+  //     direction: 'column',
+  //     message: "请上传订单完成图",
+  //   });
+  //   submitBtnLoading.value = false;
+  //   return;
+  // }
   let params = {
     orderId: applyForRefundFormData.orderId,
     fileFlag: 1
